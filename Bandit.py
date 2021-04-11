@@ -7,19 +7,6 @@ import numpy as np
 import scipy.stats as stats
 
 
-# Helper Function
-def online_update_mean_var(r, new_instance, this_mean, this_m2):
-    this_delta=new_instance - this_mean
-    new_mean=this_mean+this_delta/r
-    new_m2=this_m2+this_delta*(new_instance-new_mean)
-
-    if r < 2:
-        new_var=np.nan
-    else:
-        new_var=new_m2/(r-1)
-
-    return (new_mean, new_m2, new_var)
-
 class Bandit(abc.ABC,object):
     """Abstract Class for Bandits
     Attributes:
@@ -81,4 +68,3 @@ class Bandit(abc.ABC,object):
             None
         """
         self.true_expected_rewards=np.einsum('ak,akd,dt->at', self.reward_function['pi'], self.reward_function['theta'], self.context)
-        
