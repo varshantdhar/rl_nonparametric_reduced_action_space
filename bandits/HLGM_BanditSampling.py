@@ -6,6 +6,7 @@ import scipy.stats as stats
 import pickle
 import sys, os
 import pdb
+import inspect
 
 import deepmind_lab
 
