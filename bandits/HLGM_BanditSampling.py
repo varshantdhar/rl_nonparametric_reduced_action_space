@@ -20,13 +20,9 @@ def action_segments():
 	env = deepmind_lab.Lab('tests/empty_room_test', [])
 	action_spec = env.action_spec()
 	x = 512
-	y = 0
-	coords = [[x,y]]
-	theta = [(t * np.pi / 180) for t in range(30, 360, 30)]
-	for t in theta:
-		new_x = np.floor(x*np.cos(t) - y*np.sin(t))
-		new_y = np.floor(x*np.sin(t) + y*np.cos(t))
-		coords.append([new_x, new_y])
+	coords = [x]
+	theta = [(t * np.pi / 180) for t in range(45, 360, 45)]
+	coords = [np.floor(x*np.sin(t)) for t in theta]
 	pprint(coords)
 
 if __name__ == '__main__':
