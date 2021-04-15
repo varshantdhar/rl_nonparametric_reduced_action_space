@@ -2,11 +2,12 @@
 
 # Imports: python modules
 # Imports: other modules
-from Bandit import * 
+from Bandit import *
+
 
 class BanditSampling(Bandit):
-    """ Abstract class for bandits with sampling policies
-    
+    """Abstract class for bandits with sampling policies
+
     Attributes (besides inherited):
         reward_prior: the assumed prior for the multi-armed bandit's reward function
         reward_posterior: the posterior for the learned multi-armed bandit's reward function
@@ -14,84 +15,100 @@ class BanditSampling(Bandit):
         arm_predictive_density: predictive density of each arm
         arm_N_samples: number of candidate arm samples to draw at each time instant
     """
-    
+
     def __init__(self, A, reward_function, reward_prior, arm_predictive_policy):
-        """ Initialize the Bandit object and its attributes
-        
+        """Initialize the Bandit object and its attributes
+
         Args:
             A: the size of the bandit
             reward_function: the reward function of the bandit
             reward_prior: the assumed prior for the multi-armed bandit's reward function
             arm_predictive_policy: how to compute arm predictive density and sampling policy
         """
-        
+
         # Initialize
         super().__init__(A, reward_function)
-        
+
         # Reward prior
-        self.reward_prior=reward_prior
+        self.reward_prior = reward_prior
         # Arm predictive computation strategy
-        self.arm_predictive_policy=arm_predictive_policy
+        self.arm_predictive_policy = arm_predictive_policy
 
     def execute(self, t_max, context):
-        """ Execute the Bayesian bandit
+        """Execute the Bayesian bandit
         Args:
             t_max: maximum execution time for the bandit
             context: d_context by (at_least) t_max array with context for every time instant
         """
         # Contextual bandit
-        self.d_context=context.shape[0]
-        assert context.shape[1]>=t_max, 'Not enough context provided: context.shape[1]={} while t_max={}'.format(context.shape[1],t_max)
-        self.context=context
-        
+        self.d_context = context.shape[0]
+        assert (
+            context.shape[1] >= t_max
+        ), "Not enough context provided: context.shape[1]={} while t_max={}".format(
+            context.shape[1], t_max
+        )
+        self.context = context
+
         # Initialize attributes
-        self.actions=np.zeros((self.A,t_max))
-        self.rewards=np.zeros((self.A,t_max))
-        self.rewards_expected=np.zeros((self.A,t_max))
-        self.arm_predictive_density={'mean':np.zeros((self.A,t_max)), 'var':np.zeros((self.A,t_max))}
-        self.arm_N_samples=np.ones(t_max)
+        self.actions = np.zeros((self.A, t_max))
+        self.rewards = np.zeros((self.A, t_max))
+        self.rewards_expected = np.zeros((self.A, t_max))
+        self.arm_predictive_density = {
+            "mean": np.zeros((self.A, t_max)),
+            "var": np.zeros((self.A, t_max)),
+        }
+        self.arm_N_samples = np.ones(t_max)
 
         # Initialize reward posterior
         self.init_reward_posterior()
-        
+
         # Execute the bandit for each time instant
-        print('Start running bandit')
+        print("Start running bandit")
         for t in np.arange(t_max):
-            #print('Running time instant {}'.format(t))
-            
+            # print('Running time instant {}'.format(t))
+
             # Compute predictive density for each arm
             self.compute_arm_predictive_density(t)
 
             # Compute number of candidate arm samples, based on sampling strategy
-            self.arm_N_samples[t]=self.arm_predictive_policy['arm_N_samples']
-            
-            # Pick next action              
-            self.actions[np.random.multinomial(1,self.arm_predictive_density['mean'][:,t], size=int(self.arm_N_samples[t])).sum(axis=0).argmax(),t]=1
-            action = np.where(self.actions[:,t]==1)[0][0]
+            self.arm_N_samples[t] = self.arm_predictive_policy["arm_N_samples"]
+
+            # Pick next action
+            self.actions[
+                np.random.multinomial(
+                    1,
+                    self.arm_predictive_density["mean"][:, t],
+                    size=int(self.arm_N_samples[t]),
+                )
+                .sum(axis=0)
+                .argmax(),
+                t,
+            ] = 1
+            action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
             self.play_arm(action, t)
 
-            if np.isnan(self.rewards[action,t]):
+            if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
-                self.actions[action,t]=0.
+                self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
 
-        print('Finished running bandit at {}'.format(t))
+        print("Finished running bandit at {}".format(t))
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret
-        self.regrets=self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
-        self.cumregrets=self.regrets.cumsum()
+        self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
+        self.cumregrets = self.regrets.cumsum()
 
-    @abc.abstractmethod            
+    @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
-        """ Abstract method to compute the predictive density of each arm
+        """Abstract method to compute the predictive density of each arm
             It is based on available information at time t, which depends on posterior update type
-            
-            Different alternatives on computing the arm predictive density are considered            
+
+            Different alternatives on computing the arm predictive density are considered
             - Integration: Monte Carlo
                 Due to analitical intractability, resort to MC
                 MC over rewards:
@@ -112,9 +129,12 @@ class BanditSampling(Bandit):
         Args:
             t: time of the execution of the bandit
         """
+
+
 # Making sure the main program is not executed when the module is imported
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
+
 
 
 

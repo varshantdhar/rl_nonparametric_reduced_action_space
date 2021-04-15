@@ -44,7 +44,7 @@ class MCMCPosterior(object):
         self.reward_posterior['Z']=np.nan*np.ones((self.A, self.rewards.shape[1]))
 
     def update_reward_posterior(self, t):
-    	 """ Update the posterior of the reward density, based on available information at time t
+        """ Update the posterior of the reward density, based on available information at time t
             Update the posterior following a MCMC approximation approach
         Args:
             t: time of the execution of the bandit
@@ -80,7 +80,7 @@ class MCMCPosterior(object):
             else:
                 raise ValueError('Invalid reward_prior K={}'.format(self.reward_prior['K'])
             # Update posterior with this new assignment
-             self.update_reward_posterior_params('add', a, k_new, x_a[:,n], y_a[n])
+            self.update_reward_posterior_params('add', a, k_new, x_a[:,n], y_a[n])
 
         else:
             # Previous mixture assignments for this arm
@@ -238,7 +238,7 @@ class MCMCPosterior(object):
 
 
     def update_reward_posterior_params(self, how, a, k, x, y):
-    	# For arm and mixture of interest
+        # For arm and mixture of interest
         if how == 'add':
             # Update alpha
             self.reward_posterior['alpha'][a,k]+=1/2
