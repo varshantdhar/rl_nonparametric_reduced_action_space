@@ -18,11 +18,10 @@ from pprintpp import pprint
 
 def action_segments():
 	env = deepmind_lab.Lab('tests/empty_room_test', [])
-	action_spec = env.action_spec()
 	x = 512
 	y = 0
 	coords = [[x,y]]
-	theta = [(t * np.pi / 180) for t in range(30, 360, 30)]
+	theta = [(t * np.pi / 180) for t in range(15, 360, 15)]
 	for t in theta:
 		new_x = np.floor(x*np.cos(t) - y*np.sin(t))
 		new_y = np.floor(x*np.sin(t) + y*np.cos(t))
