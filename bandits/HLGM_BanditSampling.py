@@ -22,7 +22,7 @@ def action_segments():
 	x = 512
 	y = 0
 	coords = [[x,y]]
-	theta = [(t * np.pi / 180) for t in range(45, 360, 45)]
+	theta = [(t * np.pi / 180) for t in range(30, 360, 30)]
 	for t in theta:
 		new_x = np.floor(x*np.cos(t) - y*np.sin(t))
 		new_y = np.floor(x*np.sin(t) + y*np.cos(t))
