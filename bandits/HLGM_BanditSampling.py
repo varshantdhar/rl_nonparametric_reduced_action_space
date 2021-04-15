@@ -20,7 +20,7 @@ def action_segments():
 	env = deepmind_lab.Lab('tests/empty_room_test', [])
 	action_spec = env.action_spec()
 	x = 512
-	y = -512
+	y = 0
 	coords = [[x,y]]
 	theta = [(t * np.pi / 180) for t in range(45, 360, 45)]
 	for t in theta:
