@@ -26,7 +26,7 @@ def action_segments():
 		new_x = np.floor(x*np.cos(t) - y*np.sin(t))
 		new_y = np.floor(x*np.sin(t) + y*np.cos(t))
 		coords.append([new_x, new_y])
-	pprint(coords)
+	pprint(len(coords))
 
 if __name__ == '__main__':
 	path = os.path.dirname(inspect.getfile(deepmind_lab))
