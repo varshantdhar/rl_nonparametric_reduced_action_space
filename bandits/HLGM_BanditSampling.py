@@ -101,7 +101,7 @@ if __name__ == "__main__":
     rewards = 0
     length = 100
 
-    for _ in six.moves.range(length):
+    for i in six.moves.range(length):
         if not env.is_running():
             print("Environment stopped early")
             env.reset()
@@ -113,7 +113,10 @@ if __name__ == "__main__":
         theta = np.random.randn(A, K, d_context)
         sigma=np.ones((A,K))
         bandit = get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context)
-        
+        t_max = context.shape[1]
+        if i == 0:
+        	bandit.execute_init(t_max, context)
+        bandit.execute(t_max, context)
         break
         # action = agent.step(reward, obs["RGB_INTERLEAVED"])
         # reward = env.step(action, 1)

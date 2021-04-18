@@ -74,6 +74,7 @@ class Bandit(abc.ABC, object):
             t: time index (or set of indexes)
         """
         print(a, t)
+        self.rewards[a, t] = np.nan
         return
 
     def compute_true_expected_rewards(self):
