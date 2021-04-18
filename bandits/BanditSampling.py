@@ -52,6 +52,16 @@ class BanditSampling(Bandit):
         self.arm_predictive_density_R={'mean':np.zeros((self.A,t_max)), 'm2':np.zeros((self.A,t_max)), 'var':np.zeros((self.A,t_max))}
         self.arm_N_samples_R={'mean':np.zeros(t_max), 'm2':np.zeros(t_max), 'var':np.zeros(t_max)}
 
+    def execute_update(self, t_max, context):
+        # Update overall mean and variance sequentially
+        self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
+        self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
+        self.cumregrets_R['mean'], self.cumregrets_R['m2'], self.cumregrets_R['var']=online_update_mean_var(r+1, self.cumregrets, self.cumregrets_R['mean'], self.cumregrets_R['m2'])
+        self.rewards_expected_R['mean'], self.rewards_expected_R['m2'], self.rewards_expected_R['var']=online_update_mean_var(r+1, self.rewards_expected, self.rewards_expected_R['mean'], self.rewards_expected_R['m2'])
+        self.actions_R['mean'], self.actions_R['m2'], self.actions_R['var']=online_update_mean_var(r+1, self.actions, self.actions_R['mean'], self.actions_R['m2'])
+        self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'], self.arm_predictive_density_R['var']=online_update_mean_var(r+1, self.arm_predictive_density['mean'], self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'])
+        self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'], self.arm_N_samples_R['var']=online_update_mean_var(r+1, self.arm_N_samples, self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'])
+
     def execute(self, t_max, context):
         """Execute the Bayesian bandit
         Args:
@@ -76,9 +86,8 @@ class BanditSampling(Bandit):
         self.init_reward_posterior()
 
         # Execute the bandit for each time instant
-        print("Start running bandit")
+        print("Running bandit")
         for t in np.arange(t_max):
-            print('Running time instant {}'.format(t))
 
             # Compute predictive density for each arm
             self.compute_arm_predictive_density(t)
@@ -105,12 +114,12 @@ class BanditSampling(Bandit):
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
-                print("here")
+                print("No reward yet")
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
 
-        print("Finished running bandit at {}".format(t))
+        print("Finished running bandit")
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret
