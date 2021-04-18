@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from agent import *
+from agents import agent
 
 # Imports: python modules
 import abc
@@ -75,7 +75,7 @@ class Bandit(abc.ABC, object):
             a: arm to play
             t: time index (or set of indexes)
         """
-        dqn_agent = agent.DQN()
+        dqn_agent = agent.QLearning_Agent()
         dqn_agent.step(a)
         self.rewards[a, t] = np.nan
         return

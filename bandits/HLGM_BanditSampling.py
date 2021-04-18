@@ -2,7 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-from agent import action_segments
+from agents import agent
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     path = os.path.dirname(inspect.getfile(deepmind_lab))
     deepmind_lab.set_runfiles_path(path)
 
-    coords, A = action_segments()  # Rotation Axes, Number of Arms
+    coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
     rewards = 0
     R = 10 # Number of realizations to run
     t_max = 100 # Time-instants to run the bandit
