@@ -44,7 +44,7 @@ if __name__ == "__main__":
     K = 2  # Number of Mixtures per arm in the bandit
     prior_K = 2  #
     pi = np.random.rand(A, K)
-    pi = pi / pi.sum(axis=1)
+    pi = pi/pi.sum(axis=1)
     theta = np.random.randn(A, K, args.d_context)
 
     env = deepmind_lab.Lab(
