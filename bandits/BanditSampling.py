@@ -132,7 +132,6 @@ class BanditSampling(Bandit):
             break
 
         print("Finished running bandit")
-        return
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret

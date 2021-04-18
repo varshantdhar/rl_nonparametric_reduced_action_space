@@ -2,8 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-
-# from agent import *
+from Agent import action_segments
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
@@ -18,19 +17,6 @@ import pdb
 import inspect
 
 import deepmind_lab
-
-
-def action_segments():
-	x = 512
-	y = 0
-	coords = [[x, y]]
-	theta = [(t * np.pi / 180) for t in range(15, 360, 15)]
-	for t in theta:
-		new_x = np.floor(x * np.cos(t) - y * np.sin(t))
-		new_y = np.floor(x * np.sin(t) + y * np.cos(t))
-		coords.append([new_x, new_y])
-	A = len(coords)
-	return coords, A
 
 
 def get_bandit(A, K, pi, theta, sigma, prior_K, d_context):

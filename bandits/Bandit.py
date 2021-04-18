@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from Agent import *
+
 # Imports: python modules
 import abc
 import numpy as np
@@ -73,7 +75,8 @@ class Bandit(abc.ABC, object):
             a: arm to play
             t: time index (or set of indexes)
         """
-        print(a, t)
+        agent = Agent.DQN()
+        agent.step(a)
         self.rewards[a, t] = np.nan
         return
 
