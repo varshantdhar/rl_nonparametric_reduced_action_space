@@ -34,6 +34,38 @@ class BanditSampling(Bandit):
         # Arm predictive computation strategy
         self.arm_predictive_policy = arm_predictive_policy
 
+    def execute_realizations(self, R, t_max, context=None, exec_type='sequential'):
+        """ Execute R realizations of the bandit
+        Args:
+            R: number of realizations to run
+            t_max: maximum execution time for the bandit
+            context: d_context by (at_least) t_max array with context for every time instant (None if does not apply)
+            exec_type: batch (keep data from all realizations) or sequential (update mean and variance of realizations data)
+        """
+
+        # Allocate overall variables
+        self.rewards_R={'mean':np.zeros((1,t_max)), 'm2':np.zeros((1,t_max)), 'var':np.zeros((1,t_max))}
+        self.regrets_R={'mean':np.zeros((1,t_max)), 'm2':np.zeros((1,t_max)), 'var':np.zeros((1,t_max))}
+        self.cumregrets_R={'mean':np.zeros((1,t_max)), 'm2':np.zeros((1,t_max)), 'var':np.zeros((1,t_max))}
+        self.rewards_expected_R={'mean':np.zeros((self.A,t_max)), 'm2':np.zeros((self.A,t_max)), 'var':np.zeros((self.A,t_max))}
+        self.actions_R={'mean':np.zeros((self.A,t_max)), 'm2':np.zeros((self.A,t_max)), 'var':np.zeros((self.A,t_max))}
+        self.arm_predictive_density_R={'mean':np.zeros((self.A,t_max)), 'm2':np.zeros((self.A,t_max)), 'var':np.zeros((self.A,t_max))}
+        self.arm_N_samples_R={'mean':np.zeros(t_max), 'm2':np.zeros(t_max), 'var':np.zeros(t_max)}
+
+        # Execute all
+        for r in np.arange(R):
+            # Run one realization
+            print('Executing realization {}'.format(r))
+            self.execute(t_max, context)
+            # Update overall mean and variance sequentially
+            self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
+            self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
+            self.cumregrets_R['mean'], self.cumregrets_R['m2'], self.cumregrets_R['var']=online_update_mean_var(r+1, self.cumregrets, self.cumregrets_R['mean'], self.cumregrets_R['m2'])
+            self.rewards_expected_R['mean'], self.rewards_expected_R['m2'], self.rewards_expected_R['var']=online_update_mean_var(r+1, self.rewards_expected, self.rewards_expected_R['mean'], self.rewards_expected_R['m2'])
+            self.actions_R['mean'], self.actions_R['m2'], self.actions_R['var']=online_update_mean_var(r+1, self.actions, self.actions_R['mean'], self.actions_R['m2'])
+            self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'], self.arm_predictive_density_R['var']=online_update_mean_var(r+1, self.arm_predictive_density['mean'], self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'])
+            self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'], self.arm_N_samples_R['var']=online_update_mean_var(r+1, self.arm_N_samples, self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'])
+
     def execute(self, t_max, context):
         """Execute the Bayesian bandit
         Args:
@@ -65,7 +97,7 @@ class BanditSampling(Bandit):
         # Execute the bandit for each time instant
         print("Start running bandit")
         for t in np.arange(t_max):
-            # print('Running time instant {}'.format(t))
+            print('Running time instant {}'.format(t))
 
             # Compute predictive density for each arm
             self.compute_arm_predictive_density(t)
@@ -92,6 +124,7 @@ class BanditSampling(Bandit):
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
+                print("here")
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)

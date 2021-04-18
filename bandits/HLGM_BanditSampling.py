@@ -33,7 +33,7 @@ def action_segments():
 	return coords, A
 
 
-def run(A, K, pi, theta, sigma, prior_K, context, d_context):
+def get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context):
 	reward_function={'pi': pi, 'theta': theta, 'sigma': sigma}
 
 	########## Inference
@@ -78,9 +78,8 @@ def run(A, K, pi, theta, sigma, prior_K, context, d_context):
 		'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
 
 	bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
-	bandit.execute(t_max=20, context=context)
+	return bandit
 
-	return
 
 
 if __name__ == "__main__":
@@ -113,7 +112,8 @@ if __name__ == "__main__":
         pi = pi / pi.sum(axis=1, keepdims=True)
         theta = np.random.randn(A, K, d_context)
         sigma=np.ones((A,K))
-        run(A, K, pi, theta, sigma, prior_K, context, d_context)
+        bandit = get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context)
+        
         break
         # action = agent.step(reward, obs["RGB_INTERLEAVED"])
         # reward = env.step(action, 1)
