@@ -115,7 +115,7 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
                 pi = np.array(
                     [
                         (
-                            selfnonparametric.reward_prior["gamma"][a]
+                            self.reward_prior["gamma"][a]
                             + K_a * self.reward_prior["d"][a]
                         )
                         / (N_ak.sum() + self.reward_prior["gamma"][a])
