@@ -113,7 +113,7 @@ if __name__ == "__main__":
         pi = pi / pi.sum(axis=1, keepdims=True)
         theta = np.random.randn(A, K, d_context)
         sigma=np.ones((A,K))
-        run(A, K, pi, theta, sigma, prior_K, context)
+        run(A, K, pi, theta, sigma, prior_K, context, d_context)
         break
         # action = agent.step(reward, obs["RGB_INTERLEAVED"])
         # reward = env.step(action, 1)
