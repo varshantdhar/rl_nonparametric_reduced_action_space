@@ -43,9 +43,6 @@ if __name__ == "__main__":
     coords, A = action_segments()  # Rotation Axes, Number of Arms
     K = 2  # Number of Mixtures per arm in the bandit
     prior_K = 2  #
-    pi = np.random.rand(A, K)
-    pi = pi/pi.sum(axis=1, keepdims=True)
-    theta = np.random.randn(A, K, args.d_context)
 
     env = deepmind_lab.Lab(
         "tests/empty_room_test",
@@ -64,6 +61,9 @@ if __name__ == "__main__":
         context = env.observations()["RGB_INTERLEAVED"]
         pprint(context.shape)
         break
+        pi = np.random.rand(A, K)
+    	pi = pi/pi.sum(axis=1, keepdims=True)
+    	theta = np.random.randn(A, K, args.d_context)
         run(context)
         action = agent.step(reward, obs["RGB_INTERLEAVED"])
         reward = env.step(action, 1)
