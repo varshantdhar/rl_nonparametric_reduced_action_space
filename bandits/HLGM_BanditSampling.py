@@ -33,20 +33,13 @@ def action_segments():
 	return coords, A
 
 
-def get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context):
+def get_bandit(A, K, pi, theta, sigma, prior_K, d_context):
 	reward_function={'pi': pi, 'theta': theta, 'sigma': sigma}
 
 	########## Inference
 	# MCMC (Gibbs) parameters
 	gibbs_max_iter=4
 	gibbs_loglik_eps=0.01
-	# Plotting
-	gibbs_plot_save='show'
-	gibbs_plot_save=None
-	if gibbs_plot_save != None and gibbs_plot_save != 'show':
-		# Plotting directories
-		gibbs_plots=dir_string+'/gibbs_plots'
-		os.makedirs(gibbs_plots, exist_ok=True)
 
 	########## Priors
 	gamma=0.1
@@ -87,8 +80,20 @@ if __name__ == "__main__":
     deepmind_lab.set_runfiles_path(path)
 
     coords, A = action_segments()  # Rotation Axes, Number of Arms
-    K = 2  # Number of Mixtures per arm in the bandit
-    prior_K = 2  #
+    rewards = 0
+    R = 10 # Number of realizations to run
+    t_max = 100 # Time-instants to run the bandit
+    width = 8
+    height = 8
+    d_context = width * height * 3 # Context dimension
+
+    prior_K = 2  # Number of Mixtures per arm in the bandit
+    pi = np.random.rand(A, K)  
+    pi = pi / pi.sum(axis=1, keepdims=True) # Mixture proportions per arm
+    theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
+    sigma=np.ones((A,K)) # Variances per arm and mixtures
+
+    bandit = get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context)
 
     env = deepmind_lab.Lab(
         "tests/empty_room_test",
@@ -96,27 +101,7 @@ if __name__ == "__main__":
         config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
     )
 
-    env.reset()
+    bandit.execute_realizations(R, t_max, env, d_context)
 
-    rewards = 0
-    length = 100
-    t_max = 1
-
-    for i in six.moves.range(length):
-        if not env.is_running():
-            print("Environment stopped early")
-            env.reset()
-        context = env.observations()["RGB_INTERLEAVED"].flatten()
-        d_context = context.shape[0]
-        pi = np.random.rand(A, K)
-        pi = pi / pi.sum(axis=1, keepdims=True)
-        theta = np.random.randn(A, K, d_context)
-        sigma=np.ones((A,K))
-        bandit = get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context)
-        if i == 0:
-        	bandit.execute_init(t_max, context)
-        bandit.execute(t_max, context)
-        bandit.execute_update(t_max, context)
-        break
-        # action = agent.step(reward, obs["RGB_INTERLEAVED"])
-        # reward = env.step(action, 1)
+    # action = agent.step(reward, obs["RGB_INTERLEAVED"])
+    # reward = env.step(action, 1)
