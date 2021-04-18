@@ -2,6 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
+
 # from agent import *
 from itertools import *
 from matplotlib import colors
@@ -62,8 +63,8 @@ if __name__ == "__main__":
         pprint(context.shape)
         break
         pi = np.random.rand(A, K)
-    	pi = pi/pi.sum(axis=1, keepdims=True)
-    	theta = np.random.randn(A, K, args.d_context)
+        pi = pi / pi.sum(axis=1, keepdims=True)
+        theta = np.random.randn(A, K, args.d_context)
         run(context)
         action = agent.step(reward, obs["RGB_INTERLEAVED"])
         reward = env.step(action, 1)
