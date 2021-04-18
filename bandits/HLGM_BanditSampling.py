@@ -94,7 +94,7 @@ if __name__ == "__main__":
     theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
     sigma=np.ones((A,K)) # Variances per arm and mixtures
 
-    bandit = get_bandit(A, K, pi, theta, sigma, prior_K, context, d_context)
+    bandit = get_bandit(A, K, pi, theta, sigma, prior_K, d_context)
 
     env = deepmind_lab.Lab(
         "tests/empty_room_test",
