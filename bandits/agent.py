@@ -32,7 +32,8 @@ class QLearning_Agent(object):
 		permutations = list(product(arr1, arr1, arr2, arr2, arr2))
 		action_list = []
 		for perm in permutations:
-			action_list.append[coordinates + perm]
+			print(perm)
+			# action_list.append[coordinates + perm]
 		return action_list
 
 	def step(self, a):
