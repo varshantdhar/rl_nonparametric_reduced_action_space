@@ -91,8 +91,6 @@ class MCMCPosterior(object):
             xlik_new_k=self.compute_ylikelihood_for_new_mixture(a, x_a[:,-1], y_a[-1])
             # Probability of mixtures (seen and new)
             p_k=np.concatenate(((N_ak[:self.reward_posterior['K'][a]]-self.reward_prior['d'][a])*xlik_k/(N_ak[:self.reward_posterior['K'][a]].sum()+self.reward_prior['gamma'][a]), (self.reward_prior['gamma'][a]+self.reward_posterior['K'][a]*self.reward_prior['d'][a])*xlik_new_k/(N_ak[:self.reward_posterior['K'][a]].sum()+self.reward_prior['gamma'][a])), axis=0)
-            else:
-                raise ValueError('Invalid reward_prior K={}'.format(self.reward_prior['K']))
                 
             # Normalize mixture probabilities
             p_k=(p_k/p_k.max())/((p_k/p_k.max()).sum())
