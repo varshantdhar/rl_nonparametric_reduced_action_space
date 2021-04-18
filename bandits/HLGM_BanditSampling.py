@@ -62,6 +62,7 @@ if __name__ == "__main__":
             env.reset()
         context = env.observations()["RGB_INTERLEAVED"]
         d_context = len(context)
+        pprint(d_context)
         break
         pi = np.random.rand(A, K)
         pi = pi / pi.sum(axis=1, keepdims=True)
