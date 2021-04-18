@@ -61,7 +61,7 @@ if __name__ == "__main__":
             print("Environment stopped early")
             env.reset()
         context = env.observations()["RGB_INTERLEAVED"]
-        pprint(context.shape)
+        d_context = len(context)
         break
         pi = np.random.rand(A, K)
         pi = pi / pi.sum(axis=1, keepdims=True)
