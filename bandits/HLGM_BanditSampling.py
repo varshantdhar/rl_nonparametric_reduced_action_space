@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     rewards = 0
 
-    for _ in six.moves.range(length):
+    for _ in six.moves.range(length=100):
         if not env.is_running():
             print("Environment stopped early")
             env.reset()
