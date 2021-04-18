@@ -70,19 +70,19 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
                     size=(1, 1),
                 )
                 # Then multivariate Gaussian parameters
-                theta_samples = self.reward_posterior["theta"][a, k, :][
+                theta_samples = self.reward_posterior["theta"][a, k, :, :][
                     :, None
                 ] + np.sqrt(sigma_samples) * (
                     stats.multivariate_normal.rvs(
-                        cov=self.reward_posterior["Sigma"][a, k, :, :], size=1
+                        cov=self.reward_posterior["Sigma"][a, k, :, :, :, :], size=1
                     )
-                    .reshape(1, self.d_context)
+                    .reshape(1, self.d_context[0], self.d_context[1])
                     .T
                 )
 
                 # Compute expected reward per mixture, linearly combining context and sampled parameters
                 rewards_expected_per_mixture_samples[k, :] = np.dot(
-                    self.context[:, t], theta_samples
+                    self.context[:, t, :], theta_samples
                 )
 
             # New Mixture sampling
@@ -99,12 +99,12 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
                 stats.multivariate_normal.rvs(
                     cov=self.reward_prior["Sigma"][a, :, :], size=1
                 )
-                .reshape(1, self.d_context)
+                .reshape(1, self.d_context[0], self.d_context[1])
                 .T
             )
             # Compute expected reward per mixture, linearly combining context and sampled parameters
             rewards_expected_per_mixture_samples[-1, :] = np.dot(
-                self.context[:, t], theta_samples
+                self.context[:, t, :], theta_samples
             )
 
             ## How to compute (expected) rewards over mixtures
@@ -159,6 +159,6 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
         self.rewards_expected[:, t] = rewards_expected_samples.mean(axis=1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__prior_sigma":
     main()
 

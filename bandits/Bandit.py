@@ -67,7 +67,7 @@ class Bandit(abc.ABC, object):
             None
         """
         self.true_expected_rewards = np.einsum(
-            "ak,akd,dt->at",
+            "ak,akdl,dtl->at",
             self.reward_function["pi"],
             self.reward_function["theta"],
             self.context,

@@ -34,6 +34,52 @@ def action_segments():
 
 
 def run(A, K, pi, theta, sigma, prior_K, context):
+	reward_function={'pi': pi, 'theta': theta, 'sigma': sigma}
+
+	########## Inference
+    # MCMC (Gibbs) parameters
+    gibbs_max_iter=4
+    gibbs_loglik_eps=0.01
+    # Plotting
+    gibbs_plot_save='show'
+    gibbs_plot_save=None
+    if gibbs_plot_save != None and gibbs_plot_save != 'show':
+        # Plotting directories
+        gibbs_plots=dir_string+'/gibbs_plots'
+        os.makedirs(gibbs_plots, exist_ok=True)
+
+    ########## Priors
+    gamma=0.1
+    alpha=1.
+    beta=1.
+    sigma=1.
+    pitman_yor_d=0
+    assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
+
+    thompsonSampling={'arm_N_samples':1}
+
+    # Hyperparameters
+    # Concentration parameter
+    prior_d=pitman_yor_d*np.ones(A)
+    prior_gamma=gamma*np.ones(A)
+    # NIG for linear Gaussians
+    prior_alpha=alpha*np.ones(A)
+    prior_beta=beta*np.ones(A)
+
+    # Initial thetas
+    prior_theta=np.ones((A,d_context[0], d_context[1]))            
+    prior_Sigma=np.zeros((A,d_context[0], d_context[1], d_context[0], d_context[1]))
+    # Initial covariances: uncorrelated
+    for a in np.arange(A):
+        prior_Sigma[a,:,:,:,:]=sigma*np.eye((d_context[0],d_context[1]))
+            
+    # Reward prior as dictionary
+    reward_prior={'d':prior_d, 'gamma':prior_gamma, 'alpha':prior_alpha, 'beta':prior_beta, 'theta':prior_theta, 'Sigma':prior_Sigma, 
+    	'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
+
+    bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
+    bandit.execute()
+
     return
 
 
@@ -61,12 +107,12 @@ if __name__ == "__main__":
             print("Environment stopped early")
             env.reset()
         context = env.observations()["RGB_INTERLEAVED"]
-        d_context = len(context.shape)
-        pprint(d_context)
-        break
+        d_context = (context.shape[0],context.shape[2])
         pi = np.random.rand(A, K)
         pi = pi / pi.sum(axis=1, keepdims=True)
-        theta = np.random.randn(A, K, args.d_context)
-        run(context)
-        action = agent.step(reward, obs["RGB_INTERLEAVED"])
-        reward = env.step(action, 1)
+        theta = np.random.randn(A, K, d_context[0], d_context[1])
+        sigma=np.ones((A,K))
+        run(A, K, pi, theta, sigma, prior_K, context)
+        break
+        # action = agent.step(reward, obs["RGB_INTERLEAVED"])
+        # reward = env.step(action, 1)

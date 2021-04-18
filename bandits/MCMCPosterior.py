@@ -33,8 +33,8 @@ class MCMCPosterior(object):
         self.reward_posterior = {
             "alpha": copy.deepcopy(self.reward_prior["alpha"][:, None]),
             "beta": copy.deepcopy(self.reward_prior["beta"][:, None]),
-            "theta": copy.deepcopy(self.reward_prior["theta"][:, None, :]),
-            "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, ::]),
+            "theta": copy.deepcopy(self.reward_prior["theta"][:, None, ::]),
+            "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, ::::]),
             "K": np.zeros(self.A, dtype=int),
         }
 
@@ -54,7 +54,7 @@ class MCMCPosterior(object):
         t_a = self.actions[a, :] == 1
         # Relevant data for this arm
         y_a = self.rewards[a, t_a]
-        x_a = self.context[:, t_a]
+        x_a = self.context[:, t_a, :]
 
         # If first observation
         if t_a.sum() == 1:
