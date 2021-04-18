@@ -21,66 +21,66 @@ import deepmind_lab
 
 
 def action_segments():
-    x = 512
-    y = 0
-    coords = [[x, y]]
-    theta = [(t * np.pi / 180) for t in range(15, 360, 15)]
-    for t in theta:
-        new_x = np.floor(x * np.cos(t) - y * np.sin(t))
-        new_y = np.floor(x * np.sin(t) + y * np.cos(t))
-        coords.append([new_x, new_y])
-    A = len(coords)
-    return coords, A
+	x = 512
+	y = 0
+	coords = [[x, y]]
+	theta = [(t * np.pi / 180) for t in range(15, 360, 15)]
+	for t in theta:
+		new_x = np.floor(x * np.cos(t) - y * np.sin(t))
+		new_y = np.floor(x * np.sin(t) + y * np.cos(t))
+		coords.append([new_x, new_y])
+	A = len(coords)
+	return coords, A
 
 
 def run(A, K, pi, theta, sigma, prior_K, context):
 	reward_function={'pi': pi, 'theta': theta, 'sigma': sigma}
 
 	########## Inference
-    # MCMC (Gibbs) parameters
-    gibbs_max_iter=4
-    gibbs_loglik_eps=0.01
-    # Plotting
-    gibbs_plot_save='show'
-    gibbs_plot_save=None
-    if gibbs_plot_save != None and gibbs_plot_save != 'show':
-        # Plotting directories
-        gibbs_plots=dir_string+'/gibbs_plots'
-        os.makedirs(gibbs_plots, exist_ok=True)
+	# MCMC (Gibbs) parameters
+	gibbs_max_iter=4
+	gibbs_loglik_eps=0.01
+	# Plotting
+	gibbs_plot_save='show'
+	gibbs_plot_save=None
+	if gibbs_plot_save != None and gibbs_plot_save != 'show':
+		# Plotting directories
+		gibbs_plots=dir_string+'/gibbs_plots'
+		os.makedirs(gibbs_plots, exist_ok=True)
 
-    ########## Priors
-    gamma=0.1
-    alpha=1.
-    beta=1.
-    sigma=1.
-    pitman_yor_d=0
-    assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
+	########## Priors
+	gamma=0.1
+	alpha=1.
+	beta=1.
+	sigma=1.
+	pitman_yor_d=0
+	assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
 
-    thompsonSampling={'arm_N_samples':1}
+	thompsonSampling={'arm_N_samples':1}
 
-    # Hyperparameters
-    # Concentration parameter
-    prior_d=pitman_yor_d*np.ones(A)
-    prior_gamma=gamma*np.ones(A)
-    # NIG for linear Gaussians
-    prior_alpha=alpha*np.ones(A)
-    prior_beta=beta*np.ones(A)
+	# Hyperparameters
+	# Concentration parameter
+	prior_d=pitman_yor_d*np.ones(A)
+	prior_gamma=gamma*np.ones(A)
+	# NIG for linear Gaussians
+	prior_alpha=alpha*np.ones(A)
+	prior_beta=beta*np.ones(A)
 
-    # Initial thetas
-    prior_theta=np.ones((A,d_context[0], d_context[1]))            
-    prior_Sigma=np.zeros((A,d_context[0], d_context[1], d_context[0], d_context[1]))
-    # Initial covariances: uncorrelated
-    for a in np.arange(A):
-        prior_Sigma[a,:,:,:,:]=sigma*np.eye((d_context[0],d_context[1]))
-            
-    # Reward prior as dictionary
-    reward_prior={'d':prior_d, 'gamma':prior_gamma, 'alpha':prior_alpha, 'beta':prior_beta, 'theta':prior_theta, 'Sigma':prior_Sigma, 
-    	'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
+	# Initial thetas
+	prior_theta=np.ones((A,d_context[0], d_context[1]))
+	prior_Sigma=np.zeros((A,d_context[0], d_context[1], d_context[0], d_context[1]))
+	# Initial covariances: uncorrelated
+	for a in np.arange(A):
+		prior_Sigma[a,:,:,:,:]=sigma*np.eye((d_context[0],d_context[1]))
 
-    bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
-    bandit.execute()
+	# Reward prior as dictionary
+	reward_prior={'d':prior_d, 'gamma':prior_gamma, 'alpha':prior_alpha, 'beta':prior_beta, 'theta':prior_theta, 'Sigma':prior_Sigma, 
+		'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
 
-    return
+	bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
+	bandit.execute()
+
+	return
 
 
 if __name__ == "__main__":
