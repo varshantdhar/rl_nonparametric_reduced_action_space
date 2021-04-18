@@ -24,7 +24,7 @@ def action_segments():
 
 class QLearning_Agent(object):
 	def action_list(self, a):
-		coords, A = action_segments
+		coords, A = action_segments()
 		coordinates = coords[a]
 		return coordinates
 
