@@ -93,7 +93,7 @@ if __name__ == "__main__":
     env = deepmind_lab.Lab(
         "tests/empty_room_test",
         ["RGB_INTERLEAVED"],
-        config={"fps": "60", "controls": "external", "width":"10", "height":"10"}
+        config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
     )
 
     env.reset()
