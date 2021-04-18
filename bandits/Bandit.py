@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import Agent
+from agent import *
 
 # Imports: python modules
 import abc
