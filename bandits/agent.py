@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from itertools import product
 
 import argparse
 import random
@@ -26,6 +27,9 @@ class QLearning_Agent(object):
 	def action_list(self, a):
 		coords, A = action_segments()
 		coordinates = coords[a]
+		arr1 = [-1, 0, 1]
+		arr2 = [0, 1]
+		print(list(product(arr1, arr1, arr2, arr2, arr2)))
 		return coordinates
 
 	def step(self, a):
