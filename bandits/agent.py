@@ -19,7 +19,7 @@ def action_segments():
 	for t in theta:
 		new_x = np.floor(x * np.cos(t) - y * np.sin(t))
 		new_y = np.floor(x * np.sin(t) + y * np.cos(t))
-		coords.append([new_x, new_y])
+		coords.append((new_x, new_y))
 	A = len(coords)
 	return coords, A
 
@@ -29,8 +29,11 @@ class QLearning_Agent(object):
 		coordinates = coords[a]
 		arr1 = [-1, 0, 1]
 		arr2 = [0, 1]
-		print(list(product(arr1, arr1, arr2, arr2, arr2)))
-		return coordinates
+		permutations = list(product(arr1, arr1, arr2, arr2, arr2))
+		action_list = []
+		for perm in permutations:
+			action_list.append[coordinates + perm]
+		return action_list
 
 	def step(self, a):
 		print(self.action_list(a))
