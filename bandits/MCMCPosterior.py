@@ -34,7 +34,7 @@ class MCMCPosterior(object):
             "alpha": copy.deepcopy(self.reward_prior["alpha"][:, None]),
             "beta": copy.deepcopy(self.reward_prior["beta"][:, None]),
             "theta": copy.deepcopy(self.reward_prior["theta"][:, None, ::]),
-            "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, ::::]),
+            "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, :,:,:,:]),
             "K": np.zeros(self.A, dtype=int),
         }
 
