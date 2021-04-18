@@ -27,15 +27,13 @@ class QLearning_Agent(object):
 	def action_list(self, a):
 		coords, A = action_segments()
 		coordinates = (coords[a][0], coords[a][1])
-		arr1 = [-1, 0, 1]
-		arr2 = [0, 1]
+		arr1 = [-1.0, 0.0, 1.0]
+		arr2 = [0.0, 1.0]
 		permutations = list(product(arr1, arr1, arr2, arr2, arr2))
-		action_list = []
+		a_list = []
 		for perm in permutations:
-			print(coordinates, perm)
-			print(coordinates + perm)
-			# action_list.append[coordinates + perm]
-		return action_list
+			a_list.append[coordinates + perm]
+		return a_list
 
 	def step(self, a):
 		print(self.action_list(a))
