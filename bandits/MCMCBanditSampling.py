@@ -53,20 +53,9 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
             N_ak = np.zeros(K_a)
 
             # Rewards
-            if (
-                self.arm_predictive_policy["MC_type"] == "MC_expectedRewards"
-                or self.arm_predictive_policy["MC_type"] == "MC_arms"
-            ):
-                if self.reward_prior["K"] != "nonparametric":
-                    rewards_expected_per_mixture_samples = np.zeros((K_a, 1))
-                elif self.reward_prior["K"] == "nonparametric":
-                    rewards_expected_per_mixture_samples = np.zeros((K_a + 1, 1))
+            rewards_expected_per_mixture_samples = np.zeros((K_a + 1, 1))
 
-            elif self.arm_predictive_policy["MC_type"] == "MC_rewards":
-                if self.reward_prior["K"] != "nonparametric":
-                    rewards_per_mixture_samples = np.zeros((K_a, 1))
-                elif self.reward_prior["K"] == "nonparametric":
-                    rewards_per_mixture_samples = np.zeros((K_a + 1, 1))
+            rewards_per_mixture_samples = np.zeros((K_a + 1, 1))
 
             # Compute for each mixture
             for k in np.arange(K_a):
@@ -96,65 +85,54 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
                     self.context[:, t], theta_samples
                 )
 
-            if self.reward_prior["K"] == "nonparametric":
-                # New Mixture sampling
-                # First sample variance from inverse gamma for each mixture
-                sigma_samples = stats.invgamma.rvs(
-                    self.reward_prior["alpha"][a],
-                    scale=self.reward_prior["beta"][a],
-                    size=(1, 1),
+            # New Mixture sampling
+            # First sample variance from inverse gamma for each mixture
+            sigma_samples = stats.invgamma.rvs(
+                self.reward_prior["alpha"][a],
+                scale=self.reward_prior["beta"][a],
+                size=(1, 1),
+            )
+            # Then multivariate Gaussian parameters
+            theta_samples = self.reward_prior["theta"][a, :][:, None] + np.sqrt(
+                sigma_samples
+            ) * (
+                stats.multivariate_normal.rvs(
+                    cov=self.reward_prior["Sigma"][a, :, :], size=1
                 )
-                # Then multivariate Gaussian parameters
-                theta_samples = self.reward_prior["theta"][a, :][:, None] + np.sqrt(
-                    sigma_samples
-                ) * (
-                    stats.multivariate_normal.rvs(
-                        cov=self.reward_prior["Sigma"][a, :, :], size=1
-                    )
-                    .reshape(1, self.d_context)
-                    .T
-                )
-                # Compute expected reward per mixture, linearly combining context and sampled parameters
-                rewards_expected_per_mixture_samples[-1, :] = np.dot(
-                    self.context[:, t], theta_samples
-                )
+                .reshape(1, self.d_context)
+                .T
+            )
+            # Compute expected reward per mixture, linearly combining context and sampled parameters
+            rewards_expected_per_mixture_samples[-1, :] = np.dot(
+                self.context[:, t], theta_samples
+            )
 
             ## How to compute (expected) rewards over mixtures
             # Expected pi
             # Computed expected mixture proportions as determined by Dirichlet multinomial
             # From mixture proportions
-            if self.reward_prior["K"] != "nonparametric":
-                # Dirichlet multinomial
-                pi = (self.reward_prior["gamma"][a] + N_ak) / (
-                    self.reward_prior["gamma"][a].sum() + N_ak.sum()
-                )
-            elif self.reward_prior["K"] == "nonparametric":
-                if self.reward_posterior["K"][a] == 0:
-                    pi = np.array(
-                        [
-                            (
-                                self.reward_prior["gamma"][a]
-                                + K_a * self.reward_prior["d"][a]
-                            )
-                            / (N_ak.sum() + self.reward_prior["gamma"][a])
-                        ]
-                    )
-                else:
-                    pi = np.concatenate(
+            if self.reward_posterior["K"][a] == 0:
+                pi = np.array(
+                    [
                         (
-                            (N_ak - self.reward_prior["d"][a])
-                            / (N_ak.sum() + self.reward_prior["gamma"][a]),
-                            (
-                                self.reward_prior["gamma"][a][None]
-                                + K_a * self.reward_prior["d"][a]
-                            )
-                            / (N_ak.sum() + self.reward_prior["gamma"][a]),
-                        ),
-                        axis=0,
-                    )
+                            selfnonparametric.reward_prior["gamma"][a]
+                            + K_a * self.reward_prior["d"][a]
+                        )
+                        / (N_ak.sum() + self.reward_prior["gamma"][a])
+                    ]
+                )
             else:
-                raise ValueError(
-                    "Invalid reward_prior K={}".format(self.reward_prior["K"])
+                pi = np.concatenate(
+                    (
+                        (N_ak - self.reward_prior["d"][a])
+                        / (N_ak.sum() + self.reward_prior["gamma"][a]),
+                        (
+                            self.reward_prior["gamma"][a][None]
+                            + K_a * self.reward_prior["d"][a]
+                        )
+                        / (N_ak.sum() + self.reward_prior["gamma"][a]),
+                    ),
+                    axis=0,
                 )
 
             # Compute expected rewards, by averaging over expected mixture proportions
@@ -183,3 +161,4 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
 
 if __name__ == "__main__":
     main()
+

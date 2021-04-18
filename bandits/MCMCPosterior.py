@@ -29,26 +29,14 @@ class MCMCPosterior(object):
         Args:
             None
         """
-        if self.reward_prior["K"] != "nonparametric":
-            # Initialize reward posterior with prior
-            self.reward_posterior = copy.deepcopy(self.reward_prior)
-            if self.reward_prior["K"].size == 1:
-                self.reward_posterior["K"] = (
-                    np.ones(self.A, dtype=int) * self.reward_prior["K"]
-                )
-
-        elif self.reward_prior["K"] == "nonparametric":
-            # Initialize posterior
-            self.reward_posterior = {
-                "alpha": copy.deepcopy(self.reward_prior["alpha"][:, None]),
-                "beta": copy.deepcopy(self.reward_prior["beta"][:, None]),
-                "theta": copy.deepcopy(self.reward_prior["theta"][:, None, :]),
-                "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, ::]),
-                "K": np.zeros(self.A, dtype=int),
-            }
-
-        else:
-            raise ValueError("Invalid reward_prior K={}".format(self.reward_prior["K"]))
+        # Initialize posterior
+        self.reward_posterior = {
+            "alpha": copy.deepcopy(self.reward_prior["alpha"][:, None]),
+            "beta": copy.deepcopy(self.reward_prior["beta"][:, None]),
+            "theta": copy.deepcopy(self.reward_prior["theta"][:, None, :]),
+            "Sigma": copy.deepcopy(self.reward_prior["Sigma"][:, None, ::]),
+            "K": np.zeros(self.A, dtype=int),
+        }
 
         # Assignments to mixtures matrix
         self.reward_posterior["Z"] = np.nan * np.ones((self.A, self.rewards.shape[1]))
@@ -71,26 +59,11 @@ class MCMCPosterior(object):
         # If first observation
         if t_a.sum() == 1:
             n = 0
-            # Fixed number of mixtures
-            if self.reward_prior["K"] != "nonparametric":
-                # Likelihood of x under each mixture component
-                xlik_k = self.compute_ylikelihood_per_mixture(a, x_a[:, n], y_a[n])
-                # Assignment will be the mixture with max likelihood
-                k_new = np.argmax(xlik_k)
-                self.reward_posterior["Z"][a, t_a] = k_new
-
-            # Nonparametric number of mixtures
-            elif self.reward_prior["K"] == "nonparametric":
-                # Assign to first mixture
-                k_new = 0
-                self.reward_posterior["Z"][a, t_a] = k_new
-                # Update mixture count
-                self.reward_posterior["K"][a] += 1
-
-            else:
-                raise ValueError(
-                    "Invalid reward_prior K={}".format(self.reward_prior["K"])
-                )
+            # Assign to first mixture
+            k_new = 0
+            self.reward_posterior["Z"][a, t_a] = k_new
+            # Update mixture count
+            self.reward_posterior["K"][a] += 1
 
             # Update posterior with this new assignment
             self.update_reward_posterior_params("add", a, k_new, x_a[:, n], y_a[n])
@@ -109,58 +82,33 @@ class MCMCPosterior(object):
             Z_loglik = np.nan * np.ones(self.reward_prior["gibbs_max_iter"] + 1)
             Z_loglik[0] = np.finfo(float).min
 
-            # For new observation,
-            if self.reward_prior["K"] != "nonparametric":
-                # Likelihood of last observation for each mixture component
-                xlik_k = self.compute_ylikelihood_per_mixture(a, x_a[:, -1], y_a[-1])
-                # Probability of mixtures
-                p_k = (
+            # Likelihood of last observation for each mixture component
+            xlik_k = self.compute_ylikelihood_per_mixture(a, x_a[:, -1], y_a[-1])
+            # Likelihood of last observation for unseen mixture component
+            xlik_new_k = self.compute_ylikelihood_for_new_mixture(
+                a, x_a[:, -1], y_a[-1]
+            )
+            # Probability of mixtures (seen and new)
+            p_k = np.concatenate(
+                (
+                    (N_ak[: self.reward_posterior["K"][a]] - self.reward_prior["d"][a])
+                    * xlik_k
+                    / (
+                        N_ak[: self.reward_posterior["K"][a]].sum()
+                        + self.reward_prior["gamma"][a]
+                    ),
                     (
                         self.reward_prior["gamma"][a]
-                        + N_ak[: self.reward_posterior["K"][a]]
+                        + self.reward_posterior["K"][a] * self.reward_prior["d"][a]
                     )
+                    * xlik_new_k
                     / (
-                        self.reward_prior["gamma"][a].sum()
-                        + N_ak[: self.reward_posterior["K"][a]].sum()
-                    )
-                    * xlik_k
-                )
-
-            elif self.reward_prior["K"] == "nonparametric":
-                # Likelihood of last observation for each mixture component
-                xlik_k = self.compute_ylikelihood_per_mixture(a, x_a[:, -1], y_a[-1])
-                # Likelihood of last observation for unseen mixture component
-                xlik_new_k = self.compute_ylikelihood_for_new_mixture(
-                    a, x_a[:, -1], y_a[-1]
-                )
-                # Probability of mixtures (seen and new)
-                p_k = np.concatenate(
-                    (
-                        (
-                            N_ak[: self.reward_posterior["K"][a]]
-                            - self.reward_prior["d"][a]
-                        )
-                        * xlik_k
-                        / (
-                            N_ak[: self.reward_posterior["K"][a]].sum()
-                            + self.reward_prior["gamma"][a]
-                        ),
-                        (
-                            self.reward_prior["gamma"][a]
-                            + self.reward_posterior["K"][a] * self.reward_prior["d"][a]
-                        )
-                        * xlik_new_k
-                        / (
-                            N_ak[: self.reward_posterior["K"][a]].sum()
-                            + self.reward_prior["gamma"][a]
-                        ),
+                        N_ak[: self.reward_posterior["K"][a]].sum()
+                        + self.reward_prior["gamma"][a]
                     ),
-                    axis=0,
-                )
-            else:
-                raise ValueError(
-                    "Invalid reward_prior K={}".format(self.reward_prior["K"])
-                )
+                ),
+                axis=0,
+            )
 
             # Normalize mixture probabilities
             p_k = (p_k / p_k.max()) / ((p_k / p_k.max()).sum())
@@ -168,10 +116,7 @@ class MCMCPosterior(object):
             k_new = np.where(stats.multinomial.rvs(1, p_k))[0][0]
 
             # If new (nonparametric) mixture
-            if (
-                self.reward_prior["K"] == "nonparametric"
-                and k_new == self.reward_posterior["K"][a]
-            ):
+            if k_new == self.reward_posterior["K"][a]:
                 # Allocate space if needed
                 if k_new == N_ak.size:
                     # Increase (double) posteriors and mixture assignment sizes
@@ -247,7 +192,7 @@ class MCMCPosterior(object):
                     )
 
                     # Housekeeping for nonparametric case
-                    if self.reward_prior["K"] == "nonparametric" and N_ak[k_old] == 0:
+                    if N_ak[k_old] == 0:
                         # TODO: We are not emptying memory, just initializing with prior
                         # Empty observation counts
                         N_ak[k_old : self.reward_posterior["K"][a] - 1] = N_ak[
@@ -292,63 +237,37 @@ class MCMCPosterior(object):
                         # Reduce number of mixtures
                         self.reward_posterior["K"][a] -= 1
 
-                    # Probabilities per mixture
-                    if self.reward_prior["K"] != "nonparametric":
-                        # Likelihood of datapoint for each mixture component
-                        xlik_k = self.compute_ylikelihood_per_mixture(
-                            a, x_a[:, n], y_a[n]
-                        )
-                        # Probability of mixtures
-                        p_k = (
+                    # Likelihood of datapoint for each mixture component
+                    xlik_k = self.compute_ylikelihood_per_mixture(a, x_a[:, n], y_a[n])
+                    # Likelihood of datapoint for unseen mixture component
+                    xlik_new_k = self.compute_ylikelihood_for_new_mixture(
+                        a, x_a[:, n], y_a[n]
+                    )
+                    # Probability of mixtures (seen and new)
+                    p_k = np.concatenate(
+                        (
                             (
-                                self.reward_prior["gamma"][a]
-                                + N_ak[: self.reward_posterior["K"][a]]
-                            )
-                            / (
-                                self.reward_prior["gamma"][a].sum()
-                                + N_ak[: self.reward_posterior["K"][a]].sum()
+                                N_ak[: self.reward_posterior["K"][a]]
+                                - self.reward_prior["d"][a]
                             )
                             * xlik_k
-                        )
-
-                    elif self.reward_prior["K"] == "nonparametric":
-                        # Likelihood of datapoint for each mixture component
-                        xlik_k = self.compute_ylikelihood_per_mixture(
-                            a, x_a[:, n], y_a[n]
-                        )
-                        # Likelihood of datapoint for unseen mixture component
-                        xlik_new_k = self.compute_ylikelihood_for_new_mixture(
-                            a, x_a[:, n], y_a[n]
-                        )
-                        # Probability of mixtures (seen and new)
-                        p_k = np.concatenate(
-                            (
-                                (
-                                    N_ak[: self.reward_posterior["K"][a]]
-                                    - self.reward_prior["d"][a]
-                                )
-                                * xlik_k
-                                / (
-                                    N_ak[: self.reward_posterior["K"][a]].sum()
-                                    + self.reward_prior["gamma"][a]
-                                ),
-                                (
-                                    self.reward_prior["gamma"][a]
-                                    + self.reward_posterior["K"][a]
-                                    * self.reward_prior["d"][a]
-                                )
-                                * xlik_new_k
-                                / (
-                                    N_ak[: self.reward_posterior["K"][a]].sum()
-                                    + self.reward_prior["gamma"][a]
-                                ),
+                            / (
+                                N_ak[: self.reward_posterior["K"][a]].sum()
+                                + self.reward_prior["gamma"][a]
                             ),
-                            axis=0,
-                        )
-                    else:
-                        raise ValueError(
-                            "Invalid reward_prior K={}".format(self.reward_prior["K"])
-                        )
+                            (
+                                self.reward_prior["gamma"][a]
+                                + self.reward_posterior["K"][a]
+                                * self.reward_prior["d"][a]
+                            )
+                            * xlik_new_k
+                            / (
+                                N_ak[: self.reward_posterior["K"][a]].sum()
+                                + self.reward_prior["gamma"][a]
+                            ),
+                        ),
+                        axis=0,
+                    )
 
                     # Normalize probabilities
                     p_k = (p_k / p_k.max()) / ((p_k / p_k.max()).sum())
@@ -356,10 +275,7 @@ class MCMCPosterior(object):
                     k_new = np.where(stats.multinomial.rvs(1, p_k))[0][0]
 
                     # If new (nonparametric) mixture
-                    if (
-                        self.reward_prior["K"] == "nonparametric"
-                        and k_new == self.reward_posterior["K"][a]
-                    ):
+                    if k_new == self.reward_posterior["K"][a]:
                         # Allocate space if needed
                         if k_new == N_ak.size:
                             # Increase (double) posteriors and mixture assignment sizes
@@ -424,6 +340,7 @@ class MCMCPosterior(object):
             self.reward_posterior["Z"][a, t_a] = z_a
 
             # Plotting Gibbs loglikelihood evolution
+            """
             if self.reward_prior["gibbs_plot_save"] is not None:
                 # Plotting
                 plt.figure()
@@ -456,6 +373,7 @@ class MCMCPosterior(object):
                         bbox_inches="tight",
                     )
                 plt.close()
+                """
 
         print(
             "update_reward_posterior at t={} in {}".format(
@@ -689,34 +607,26 @@ class MCMCPosterior(object):
             N_ak: assignment sufficient statistics
         """
 
-        if self.reward_prior["K"] != "nonparametric":
-            Z_loglik = (
-                special.gammaln(self.reward_prior["gamma"][a].sum())
-                - special.gammaln(self.reward_prior["gamma"][a].sum() + N_ak.sum())
-                + special.gammaln(self.reward_prior["gamma"][a] + N_ak).sum()
-                - special.gammaln(self.reward_prior["gamma"][a]).sum()
+        Z_loglik = (
+            special.gammaln(self.reward_prior["gamma"][a])
+            - special.gammaln(
+                self.reward_prior["gamma"][a]
+                + N_ak[: self.reward_posterior["K"][a]].sum()
             )
-
-        elif self.reward_prior["K"] == "nonparametric":
-            Z_loglik = (
-                special.gammaln(self.reward_prior["gamma"][a])
-                - special.gammaln(
-                    self.reward_prior["gamma"][a]
-                    + N_ak[: self.reward_posterior["K"][a]].sum()
-                )
-                + self.reward_posterior["K"][a] * np.log(self.reward_prior["gamma"][a])
-                + special.gammaln(N_ak[: self.reward_posterior["K"][a]]).sum()
-            )
-
-        else:
-            raise ValueError(
-                "Mixture prior {} not implemented yet".format(self.reward_prior["K"])
-            )
+            + self.reward_posterior["K"][a] * np.log(self.reward_prior["gamma"][a])
+            + special.gammaln(N_ak[: self.reward_posterior["K"][a]]).sum()
+        )
 
         if np.isinf(Z_loglik):
             pdb.set_trace()
 
         return Z_loglik
+
+
+# Making sure the main program is not executed when the module is imported
+if __name__ == "__main__":
+    main()
+
 
 
 
