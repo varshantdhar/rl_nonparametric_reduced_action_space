@@ -78,7 +78,7 @@ def run(A, K, pi, theta, sigma, prior_K, context, d_context):
 		'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
 
 	bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
-	bandit.execute(t_max=20, context)
+	bandit.execute(t_max=20, context=context)
 
 	return
 
