@@ -7,8 +7,10 @@ import argparse
 import random
 import numpy as np
 import six
+import torch
 
 import deepmind_lab
+import DQN
 
 ######## Helper functions ########
 def action_segments():
@@ -32,9 +34,16 @@ class QLearning_Agent(object):
 		permutations = list(product(arr1, arr1, arr2, arr2, arr2))
 		a_list = []
 		for perm in permutations:
-			a_list.append(coordinates + perm)
+			a_list.append(np.array(coordinates + perm, dtype=np.intc))
 		return a_list
 
-	def step(self, a):
-		print(self.action_list(a))
-		return
+	def step(self, a, t, context, env):
+		actions = torch.Tensor(self.action_list(a))
+		num_disc_steps = len(actions)
+		context_dim = context[:,t].shape[0]
+		action_dim = 7
+		val_model = DQN.Q_NN_multidim(context_dim, 7, num_disc_steps, num_hidden=20)
+		targ_model = DQN.Q_NN_multidim(context_dim, 7, num_disc_steps, num_hidden=20)
+		learner = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, 
+			state_size=context_dim, history_len=3, buffer_size=5000)
+		return train(env, learner, context[:,t])

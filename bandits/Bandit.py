@@ -68,7 +68,7 @@ class Bandit(abc.ABC, object):
         self.cumregrets_R = None
         self.rewards_expected_R = None
 
-    def play_arm(self, a, t):
+    def play_arm(self, a, t, context):
         """Play bandit's arm a with true reward function
 
         Args:
@@ -76,8 +76,7 @@ class Bandit(abc.ABC, object):
             t: time index (or set of indexes)
         """
         dqn_agent = agent.QLearning_Agent()
-        dqn_agent.step(a)
-        self.rewards[a, t] = np.nan
+        self.rewards[a, t] = dqn_agent.step(a, t, context)
         return
 
     def compute_true_expected_rewards(self):

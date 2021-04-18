@@ -120,7 +120,7 @@ class BanditSampling(Bandit):
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
-            self.play_arm(action, t)
+            self.play_arm(action, t, context, env)
 
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
@@ -129,7 +129,6 @@ class BanditSampling(Bandit):
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
-            break
 
         print("Finished running bandit")
         # Compute expected rewards with true function
