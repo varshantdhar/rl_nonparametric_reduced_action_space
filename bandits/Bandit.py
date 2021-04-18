@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from agents import agent
+from rl_nonparametric_reduced_action_space/agents import agent
 
 # Imports: python modules
 import abc
