@@ -2,7 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-from rl_nonparametric_reduced_action_space import agent
+import agent
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
