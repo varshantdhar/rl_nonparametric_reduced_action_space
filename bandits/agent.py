@@ -29,5 +29,5 @@ class QLearning_Agent(object):
 		return coordinates
 
 	def step(self, a):
-		print(action_list(a))
+		print(self.action_list(a))
 		return
