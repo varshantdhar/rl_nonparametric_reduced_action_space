@@ -2,7 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-from Agent import action_segments
+import Agent
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
