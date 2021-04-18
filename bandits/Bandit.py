@@ -75,8 +75,8 @@ class Bandit(abc.ABC, object):
             a: arm to play
             t: time index (or set of indexes)
         """
-        agent = Agent.DQN()
-        agent.step(a)
+        dqn_agent = agent.DQN()
+        dqn_agent.step(a)
         self.rewards[a, t] = np.nan
         return
 
