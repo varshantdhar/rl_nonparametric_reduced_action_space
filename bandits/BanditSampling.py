@@ -96,7 +96,7 @@ class BanditSampling(Bandit):
 
             if not env.is_running():
                 print("Environment stopped early")
-            env.reset()
+                env.reset()
             context_ = env.observations()["RGB_INTERLEAVED"].flatten()
             self.context[:,t] = context_
 

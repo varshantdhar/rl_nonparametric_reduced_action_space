@@ -101,6 +101,7 @@ if __name__ == "__main__":
         ["RGB_INTERLEAVED"],
         config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
     )
+    env.reset()
 
     bandit.execute_realizations(R, t_max, env, d_context)
 
