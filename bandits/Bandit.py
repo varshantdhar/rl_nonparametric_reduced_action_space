@@ -59,6 +59,8 @@ class Bandit(abc.ABC, object):
             a: arm to play
             t: time index (or set of indexes)
         """
+        print("We made it!")
+        return
 
     def compute_true_expected_rewards(self):
         """Compute the expected rewards of the bandit for the true reward function

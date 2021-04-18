@@ -33,7 +33,7 @@ def action_segments():
 	return coords, A
 
 
-def run(A, K, pi, theta, sigma, prior_K, context):
+def run(A, K, pi, theta, sigma, prior_K, context, d_context):
 	reward_function={'pi': pi, 'theta': theta, 'sigma': sigma}
 
 	########## Inference
@@ -67,18 +67,18 @@ def run(A, K, pi, theta, sigma, prior_K, context):
 	prior_beta=beta*np.ones(A)
 
 	# Initial thetas
-	prior_theta=np.ones((A,d_context[0], d_context[1]))
-	prior_Sigma=np.zeros((A,d_context[0], d_context[1], d_context[0], d_context[1]))
+	prior_theta=np.ones((A,d_context))
+	prior_Sigma=np.zeros((A,d_context, d_context))
 	# Initial covariances: uncorrelated
 	for a in np.arange(A):
-		prior_Sigma[a,:,:,:,:]=sigma*np.eye((d_context[0],d_context[1]))
+		prior_Sigma[a,:,:]=sigma*np.eye(d_context)
 
 	# Reward prior as dictionary
 	reward_prior={'d':prior_d, 'gamma':prior_gamma, 'alpha':prior_alpha, 'beta':prior_beta, 'theta':prior_theta, 'Sigma':prior_Sigma, 
 		'gibbs_max_iter':gibbs_max_iter, 'gibbs_loglik_eps':gibbs_loglik_eps}
 
 	bandit = MCMCBanditSampling(A, reward_function, reward_prior, thompsonSampling)
-	bandit.execute()
+	bandit.execute(t_max=20, context)
 
 	return
 
@@ -106,11 +106,12 @@ if __name__ == "__main__":
         if not env.is_running():
             print("Environment stopped early")
             env.reset()
-        context = env.observations()["RGB_INTERLEAVED"]
-        d_context = (context.shape[0],context.shape[2])
+        context_ = env.observations()["RGB_INTERLEAVED"]
+        context = context_.transpose(2,0,1).reshape(-1,context_.shape[1])
+        d_context = context.shape[0]
         pi = np.random.rand(A, K)
         pi = pi / pi.sum(axis=1, keepdims=True)
-        theta = np.random.randn(A, K, d_context[0], d_context[1])
+        theta = np.random.randn(A, K, d_context)
         sigma=np.ones((A,K))
         run(A, K, pi, theta, sigma, prior_K, context)
         break

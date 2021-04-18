@@ -41,7 +41,7 @@ class BanditSampling(Bandit):
             context: d_context by (at_least) t_max array with context for every time instant
         """
         # Contextual bandit
-        self.d_context = (context.shape[0], context.shape[2])
+        self.d_context = context.shape[0]
         assert (
             context.shape[1] >= t_max
         ), "Not enough context provided: context.shape[1]={} while t_max={}".format(
