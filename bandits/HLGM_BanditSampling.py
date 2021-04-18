@@ -40,7 +40,7 @@ if __name__ == "__main__":
     path = os.path.dirname(inspect.getfile(deepmind_lab))
     deepmind_lab.set_runfiles_path(path)
 
-    coords, A = action_segments(env)  # Rotation Axes, Number of Arms
+    coords, A = action_segments()  # Rotation Axes, Number of Arms
     K = 2  # Number of Mixtures per arm in the bandit
     prior_K = 2  #
     pi = np.random.rand(A, K)
