@@ -83,7 +83,7 @@ if __name__ == "__main__":
     bandit = get_bandit(A, K, pi, theta, sigma, prior_K, d_context)
 
     env = deepmind_lab.Lab(
-        "tests/empty_room_test",
+        "seekavoid_arena_01",
         ["RGB_INTERLEAVED"],
         config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
     )
