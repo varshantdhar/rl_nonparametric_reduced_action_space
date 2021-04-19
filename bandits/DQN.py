@@ -23,7 +23,7 @@ def get_reward(env, agent, context):
     # next_state = agent.get_state(torch.Tensor(obs))
         
     # agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
-    agent.train_step(frame_count)
+    # agent.train_step(frame_count)
     # state = next_state
     frame_count += 1
     return reward
@@ -122,7 +122,6 @@ class Q_Learning:
         sample actions given a state and action space
         """
         q_values = self.value_model(state.unsqueeze(0))
-        print(q_values.shape)
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[1]), rand_ind], rand_ind
