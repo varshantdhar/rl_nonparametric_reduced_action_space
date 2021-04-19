@@ -93,8 +93,10 @@ class BanditSampling(Bandit):
 
         # Execute the bandit for each time instant
         print("Running bandit")
-        val_model = DQN.Q_NN_multidim(self.d_context, 7, 72, num_hidden=10)
-        targ_model = DQN.Q_NN_multidim(self.d_context, 7, 72, num_hidden=10)
+        action_dim = 7
+        num_actions = 72
+        val_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
+        targ_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
         dqn_agent = agent.QLearning_Agent()
 
         for t in np.arange(t_max):

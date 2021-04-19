@@ -39,14 +39,12 @@ class QLearning_Agent(object):
 		a_list = []
 		for perm in permutations:
 			a_list.append(np.array(coordinates + perm, dtype=np.intc))
-		if str(a) not in self.QLearning_Buffer.keys():
-			self.QLearning_Buffer[str(a)] = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, uniform_action_space, state_size=24, history_len=1)
 		return a_list
 
 	def step(self, a, t, context, env, val_model, targ_model):
 		actions = torch.Tensor(self.action_list(a, val_model, targ_model))
-		num_actions = len(actions)
 		context_size = context.shape[0]
-		action_dim = 7
+		if str(a) not in self.QLearning_Buffer.keys():
+			self.QLearning_Buffer[str(a)] = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, context_size, history_len=1)
 		reward, self.q_learning_rewards = DQN.ql(env, self.QLearning_Buffer[str(a)], context[:,t], t, self.q_learning_rewards)
 		return reward
