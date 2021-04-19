@@ -293,30 +293,25 @@ class MCMCPosterior(object):
             x_a: relevant context
             y_a: relevant rewards
         """
-
-        if self.reward_prior['type'] == 'linear_gaussian_mixture' and self.reward_prior['dist'] == 'NIG':
-            # Sufficient statistics of posterior
-            nu_Y=2*self.reward_posterior['alpha'][a]
-            Omega_Y=2*self.reward_posterior['beta'][a]
-            XcondZ_loglik=0.
-            # For each valid k
-            for k in np.arange(self.reward_posterior['K'][a]):
-                # Find and count
-                k_idx=(z_a==k)
-                n_Y=k_idx.sum()
-                # Suff stats
-                M_Y=np.einsum('dn,d->n', x_a[:,k_idx], self.reward_posterior['theta'][a,k])
-                Psi_Y=np.eye(n_Y)+np.einsum('an,ab,bt->nt', x_a[:,k_idx], self.reward_posterior['Sigma'][a,k], x_a[:,k_idx])
-                # Inside det
-                tmp=np.eye(n_Y)+np.einsum('ab, bc-> ac', np.linalg.inv(Psi_Y), (y_a[k_idx]-M_Y)[:,None] * (y_a[k_idx]-M_Y)[None,:]/Omega_Y[k])
-                # Add this k loglikelihood
-                XcondZ_loglik+=special.gammaln((nu_Y[k]+n_Y)/2) - special.gammaln((nu_Y[k])/2) -n_Y/2*(np.log(np.pi)+np.log(Omega_Y[k]))-1/2*np.log(np.linalg.det(Psi_Y))-((nu_Y[k]+n_Y)/2)*np.log(np.linalg.det(tmp))
-                
-                if np.isinf(XcondZ_loglik):
-                    pdb.set_trace()
-
-        else:
-            raise ValueError('reward_prior type {} not implemented yet'.format(self.reward_prior['type']))
+        # Sufficient statistics of posterior
+        nu_Y=2*self.reward_posterior['alpha'][a]
+        Omega_Y=2*self.reward_posterior['beta'][a]
+        XcondZ_loglik=0.
+        # For each valid k
+        for k in np.arange(self.reward_posterior['K'][a]):
+            # Find and count
+            k_idx=(z_a==k)
+            n_Y=k_idx.sum()
+            # Suff stats
+            M_Y=np.einsum('dn,d->n', x_a[:,k_idx], self.reward_posterior['theta'][a,k])
+            Psi_Y=np.eye(n_Y)+np.einsum('an,ab,bt->nt', x_a[:,k_idx], self.reward_posterior['Sigma'][a,k], x_a[:,k_idx])
+            # Inside det
+            tmp=np.eye(n_Y)+np.einsum('ab, bc-> ac', np.linalg.inv(Psi_Y), (y_a[k_idx]-M_Y)[:,None] * (y_a[k_idx]-M_Y)[None,:]/Omega_Y[k])
+            # Add this k loglikelihood
+            XcondZ_loglik+=special.gammaln((nu_Y[k]+n_Y)/2) - special.gammaln((nu_Y[k])/2) -n_Y/2*(np.log(np.pi)+np.log(Omega_Y[k]))-1/2*np.log(np.linalg.det(Psi_Y))-((nu_Y[k]+n_Y)/2)*np.log(np.linalg.det(tmp))
+            
+            if np.isinf(XcondZ_loglik):
+                pdb.set_trace()
 
         return XcondZ_loglik
 
