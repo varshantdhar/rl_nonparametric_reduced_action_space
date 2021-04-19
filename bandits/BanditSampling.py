@@ -159,6 +159,7 @@ class BanditSampling(Bandit):
         # Compute regret
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
+        print("Cumulative Regrets for Episode: {}".format(self.cumregrets))
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
