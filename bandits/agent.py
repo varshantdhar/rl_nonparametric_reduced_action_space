@@ -40,7 +40,7 @@ class QLearning_Agent(object):
 		for perm in permutations:
 			a_list.append(np.array(coordinates + perm, dtype=np.intc))
 		if str(a) not in self.QLearning_Buffer.keys():
-			self.QLearning_Buffer[str(a)] = Q_Learning(0.5, 0.99, val_model, targ_model, uniform_action_space, state_size=24, history_len=1)
+			self.QLearning_Buffer[str(a)] = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, uniform_action_space, state_size=24, history_len=1)
 		return a_list
 
 	def step(self, a, t, context, env, val_model, targ_model):
