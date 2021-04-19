@@ -136,6 +136,7 @@ class BanditSampling(Bandit):
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
+            print(t)
             t += 1
 
         # reonfigure
