@@ -123,7 +123,7 @@ class Q_Learning:
         sample actions given a state and action space
         """
         q_values = self.value_model(state.unsqueeze(0))
-        print(q_values)
+        print(q_values.shape)
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[0]), rand_ind], rand_ind
