@@ -99,6 +99,7 @@ class BanditSampling(Bandit):
         targ_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
         dqn_agent = agent.QLearning_Agent()
         env.reset()
+        print(env.is_running())
 
         while env.is_running():
 
@@ -138,7 +139,7 @@ class BanditSampling(Bandit):
                 self.update_reward_posterior(t)
             print(t)
             t += 1
-            
+
         print("Finished running bandit")
 
         # reonfigure
