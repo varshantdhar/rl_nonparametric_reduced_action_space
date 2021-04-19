@@ -4,6 +4,7 @@
 # Imports: other modules
 from Bandit import *
 import DQN
+import agent
 
 class BanditSampling(Bandit):
     """Abstract class for bandits with sampling policies
@@ -94,7 +95,7 @@ class BanditSampling(Bandit):
         print("Running bandit")
         val_model = DQN.Q_NN_multidim(self.d_context, 7, 72, num_hidden=10)
         targ_model = DQN.Q_NN_multidim(self.d_context, 7, 72, num_hidden=10)
-        self.QLearning_Buffer = {}
+        dqn_agent = agent.QLearning_Agent()
 
         for t in np.arange(t_max):
 
@@ -123,14 +124,9 @@ class BanditSampling(Bandit):
                 t,
             ] = 1
             action = np.where(self.actions[:, t] == 1)[0][0]
-            self.q_learning_rewards = []
 
             # Play selected arm
-            if str(action) not in self.QLearning_Buffer.keys():
-                self.QLearning_Buffer[str(action)] = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, state_size=context_size, history_len=1)
-            
-            self.play_arm(action, t, env)
-                
+            self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
 
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)

@@ -8,7 +8,7 @@ import time
 device = "cpu"
 
 
-def get_reward(env, agent, context, frame_count, running_rewards):
+def ql(env, agent, context, frame_count, running_rewards):
     running_rewards = []
     # for i in range(n_epoch):
     start_time = time.process_time()
@@ -19,15 +19,14 @@ def get_reward(env, agent, context, frame_count, running_rewards):
     values, action_ind = agent.get_action(state)
     action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
     reward = env.step(action, 1)
-    # next_state = agent.get_state(torch.Tensor(obs))
+    next_context = env.observations()["RGB_INTERLEAVED"].flatten()
+    next_state = agent.get_state(torch.Tensor(next_context))
         
-    # agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
-    # agent.train_step(frame_count)
-    # state = next_state
-    frame_count += 1
+    agent.replay_buffer.add_sample(state, action_ind, reward, next_state, False)
+    agent.train_step(frame_count)
     running_rewards.append(reward)
     print(frame_count, time.process_time() - start_time, reward)
-    return reward
+    return (reward, running_rewards)
 
 class SAValueNN(nn.Module):
     def __init__(self, num_hidden, num_actions):

@@ -68,15 +68,14 @@ class Bandit(abc.ABC, object):
         self.cumregrets_R = None
         self.rewards_expected_R = None
 
-    def play_arm(self, a, t, env):
+    def play_arm(self, a, t, env, dqn_agent, context, val_model, targ_model):
         """Play bandit's arm a with true reward function
 
         Args:
             a: arm to play
             t: time index (or set of indexes)
         """
-        dqn_agent = agent.QLearning_Agent()
-        self.rewards[a, t] = dqn_agent.step(a, t, self.context, env, self.q_learning_rewards, self.QLearning_Buffer[str(a)])
+        self.rewards[a, t] = dqn_agent.step(a, t, context, env, val_model, targ_model)
 
     def compute_true_expected_rewards(self):
         """Compute the expected rewards of the bandit for the true reward function
