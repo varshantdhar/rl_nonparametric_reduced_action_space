@@ -75,6 +75,7 @@ class Bandit(abc.ABC, object):
             a: arm to play
             t: time index (or set of indexes)
         """
+        print(a)
         dqn_agent = agent.QLearning_Agent()
         self.rewards[a, t] = dqn_agent.step(a, t, context, env)
 
