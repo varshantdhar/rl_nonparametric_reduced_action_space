@@ -169,9 +169,9 @@ class Q_Learning:
         values = self.value_model(states)
         target_values = self.target_model(next_states)
 
-        loss = agent.calc_loss(values, action_ind, target_values, rewards, done_flags)
+        loss = self.calc_loss(values, action_ind, target_values, rewards, done_flags)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.value_model.parameters(), 10)
         
         if frame_count % self.target_model_update_freq == 0:
-            agent.update_target_model()
+            self.update_target_model()
