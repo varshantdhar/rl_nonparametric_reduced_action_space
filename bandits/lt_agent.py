@@ -15,14 +15,17 @@ import deepmind_lab
 import DQN
 
 def main(env):
-	pprint(env.action_spec())
-	pprint(env.observation_spec())
+    pprint(env.action_spec())
+    pprint(env.observation_spec())
 
 
-if __name__ == '__main__':
-	env = deepmind_lab.Lab('lt_chasm', observations,config={'width': '8',    # screen size, in pixels
-		'height': '8',   # screen size, in pixels
-		'botCount': '1'},  # lt_chasm option.
-		renderer='hardware')       # select renderer.
+if __name__ == "__main__":
+    observations = ["RGB"]
+    env = deepmind_lab.Lab(
+        "lt_chasm",
+        observations,
+        config={"width": "8", "height": "8", "botCount": "1"},
+        renderer="hardware",
+    )
     env.reset()
-	main(env)
+    main(env)
