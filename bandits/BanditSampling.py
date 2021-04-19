@@ -145,7 +145,7 @@ class BanditSampling(Bandit):
         print("Finished running bandit")
 
         # reonfigure
-        self.context = self.context[:,:t]
+        self.context = self.context[:, :t]
         self.actions = self.actions[:, :t]
         self.rewards = self.rewards[:, :t]
         self.rewards_expected = self.rewards_expected[:, :t]
@@ -160,7 +160,7 @@ class BanditSampling(Bandit):
         # Compute regret
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
-        print("Cumulative Regrets for Episode: {}".format(self.cumregrets))
+        print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
