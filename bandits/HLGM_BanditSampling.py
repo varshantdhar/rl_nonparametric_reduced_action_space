@@ -68,7 +68,7 @@ if __name__ == "__main__":
     coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
     rewards = 0
     R = 50 # Number of realizations to run
-    t_max = 800 # Time-instants to run the bandit
+    t_max = 500 # Time-instants to run the bandit
     width = 8
     height = 8
     d_context = width * height * 3 # Context dimension
