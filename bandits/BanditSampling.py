@@ -145,6 +145,7 @@ class BanditSampling(Bandit):
         print("Finished running bandit")
 
         # reonfigure
+        self.context = self.context[:,:t]
         self.actions = self.actions[:, :t]
         self.rewards = self.rewards[:, :t]
         self.rewards_expected = self.rewards_expected[:, :t]
