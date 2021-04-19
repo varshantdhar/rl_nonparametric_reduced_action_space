@@ -77,7 +77,7 @@ class Bandit(abc.ABC, object):
         """
         print(a)
         dqn_agent = agent.QLearning_Agent()
-        self.rewards[a, t] = dqn_agent.step(a, context, env)
+        self.rewards[a, t] = dqn_agent.step(a, t, context, env)
 
     def compute_true_expected_rewards(self):
         """Compute the expected rewards of the bandit for the true reward function
