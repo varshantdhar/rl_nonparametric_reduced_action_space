@@ -128,7 +128,8 @@ class BanditSampling(Bandit):
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
-            print("Running DQN to select action from action set")
+            if t == 0:
+                print("Running DQN to select action from action set")
             self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
 
             if np.isnan(self.rewards[action, t]):
