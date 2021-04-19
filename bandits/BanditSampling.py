@@ -56,8 +56,8 @@ class BanditSampling(Bandit):
         # Initialize target and value networks for Deep Q-Learning
         action_dim = 7
         num_actions = 72
-        val_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
-        targ_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
+        val_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=10)
+        targ_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=10)
         # Initialize agent
         dqn_agent = agent.QLearning_Agent()
 
