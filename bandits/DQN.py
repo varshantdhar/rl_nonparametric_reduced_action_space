@@ -8,8 +8,7 @@ import time
 device = "cpu"
 
 
-def get_reward(env, agent, context):
-    frame_count = 0
+def get_reward(env, agent, context, frame_count, running_rewards):
     running_rewards = []
     # for i in range(n_epoch):
     start_time = time.process_time()
@@ -26,9 +25,9 @@ def get_reward(env, agent, context):
     # agent.train_step(frame_count)
     # state = next_state
     frame_count += 1
+    running_rewards.append(reward)
+    print(frame_count, time.process_time() - start_time, reward)
     return reward
-    # running_rewards.append(episode_reward)
-    # print(i, time.process_time() - start_time, episode_reward)
 
 class SAValueNN(nn.Module):
     def __init__(self, num_hidden, num_actions):

@@ -37,7 +37,7 @@ class QLearning_Agent(object):
 			a_list.append(np.array(coordinates + perm, dtype=np.intc))
 		return a_list
 
-	def step(self, a, t, context, env):
+	def step(self, a, t, context, env, running_rewards):
 		actions = torch.Tensor(self.action_list(a))
 		num_actions = len(actions)
 		context_size = context.shape[0]
@@ -45,4 +45,4 @@ class QLearning_Agent(object):
 		val_model = DQN.Q_NN_multidim(context_size, 7, num_actions, num_hidden=10)
 		targ_model = DQN.Q_NN_multidim(context_size, 7, num_actions, num_hidden=10)
 		learner = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, state_size=context_size, history_len=1, batch_size=0)
-		return DQN.get_reward(env, learner, context[:,t])
+		return DQN.get_reward(env, learner, context[:,t], t, running_rewards)

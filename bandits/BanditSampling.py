@@ -94,6 +94,7 @@ class BanditSampling(Bandit):
         print("Running bandit")
         for t in np.arange(t_max):
 
+
             if not env.is_running():
                 print("Environment stopped early")
                 env.reset()
@@ -120,14 +121,14 @@ class BanditSampling(Bandit):
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
-            self.play_arm(action, t, self.context, env)
+            self.q_learning_rewards = []
+            self.play_arm(action, t, env)
 
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
-                print("Made it here")
                 self.update_reward_posterior(t)
 
         print("Finished running bandit")
