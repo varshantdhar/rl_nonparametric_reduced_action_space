@@ -28,6 +28,7 @@ def ql(env, agent, context, frame_count, running_rewards):
     agent.train_step(frame_count)
     if reward > 0:
         running_rewards += reward
+        print('Score (cumulative rewards): {} '.format(running_rewards))
     return (reward, running_rewards)
 
 class SAValueNN(nn.Module):
