@@ -115,13 +115,14 @@ class Q_Learning:
         
     def random_sample(self):
         # for now, assume action space is a vector of actions
-        return torch.LongTensor([random.randrange(self.action_space.shape[1]) for _ in range(self.action_space.shape[0])])
+        return torch.LongTensor([random.randrange(self.action_space.shape[0]) for _ in range(self.action_space.shape[1])])
         
     def get_action(self, state):
         """
         sample actions given a state and action space
         """
         q_values = self.value_model(state.unsqueeze(0))
+        print(q_values.shape)
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[1]), rand_ind], rand_ind
