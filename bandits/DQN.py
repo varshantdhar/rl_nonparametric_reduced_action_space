@@ -18,6 +18,7 @@ def get_reward(env, agent, context):
     agent.epsilon *= 0.99
     # while not done:
     values, action_ind = agent.get_action(state)
+    print(values, action_ind)
     reward = env.step(agent.choose_action(action_ind), 1)
     # next_state = agent.get_state(torch.Tensor(obs))
         
