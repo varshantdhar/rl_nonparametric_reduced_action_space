@@ -76,7 +76,7 @@ class Bandit(abc.ABC, object):
             t: time index (or set of indexes)
         """
         dqn_agent = agent.QLearning_Agent()
-        self.rewards[a, t] = dqn_agent.step(a, t, self.context, env, self.q_learning_rewards)
+        self.rewards[a, t] = dqn_agent.step(a, t, self.context, env, self.q_learning_rewards, self.QLearning_Buffer[str(a)])
 
     def compute_true_expected_rewards(self):
         """Compute the expected rewards of the bandit for the true reward function
