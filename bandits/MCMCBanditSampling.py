@@ -70,11 +70,11 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
                     size=(1, 1),
                 )
                 # Then multivariate Gaussian parameters
-                theta_samples = self.reward_posterior["theta"][a, k, :, :][
+                theta_samples = self.reward_posterior["theta"][a, k, :][
                     :, None
                 ] + np.sqrt(sigma_samples) * (
                     stats.multivariate_normal.rvs(
-                        cov=self.reward_posterior["Sigma"][a, k, :, :, :, :], size=1
+                        cov=self.reward_posterior["Sigma"][a, k, :, :], size=1
                     )
                     .reshape(1, self.d_context)
                     .T
