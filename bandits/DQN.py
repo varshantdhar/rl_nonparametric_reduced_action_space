@@ -93,7 +93,7 @@ class ReplayBuffer:
         
 class Q_Learning:
     def __init__(self, epsilon, gamma, value_model, target_model, action_space, state_size, state_scaling=100,
-                history_len=3, buffer_size=1000, batch_size=224):
+                history_len=3, buffer_size=1000, batch_size=128 ):
         self.epsilon = epsilon
         self.gamma = gamma
         self.value_model = value_model
