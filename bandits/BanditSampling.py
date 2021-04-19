@@ -136,7 +136,7 @@ class BanditSampling(Bandit):
             t += 1
 
         print("Finished running bandit")
-        print(self.context.shape)
+        print(self.context.shape, self.rewards.shape)
 
         # reonfigure
         self.actions = self.actions[:, :(t-1)]
