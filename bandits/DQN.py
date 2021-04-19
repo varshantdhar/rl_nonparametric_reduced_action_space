@@ -93,7 +93,7 @@ class ReplayBuffer:
         
 class Q_Learning:
     def __init__(self, epsilon, gamma, value_model, target_model, action_space, state_size, state_scaling=100,
-                history_len=3, buffer_size=1000, batch_size=128):
+                history_len=3, buffer_size=1000, batch_size=224):
         self.epsilon = epsilon
         self.gamma = gamma
         self.value_model = value_model
@@ -152,8 +152,8 @@ class Q_Learning:
         
         q_target = rewards + ~done_flags*self.gamma*max_target_vals
 
-        q_taken = q_values.view(128*4, -1)[range(128*4), action_taken_ind.view(128*4)]
-        q_target = q_target.view(128*4)
+        q_taken = q_values.view(224*4, -1)[range(224*4), action_taken_ind.view(224*4)]
+        q_target = q_target.view(224*4)
         return torch.nn.functional.mse_loss(q_taken, q_target)
     
     def update(self, loss):
