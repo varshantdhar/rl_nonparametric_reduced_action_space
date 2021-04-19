@@ -89,5 +89,4 @@ class Bandit(abc.ABC, object):
             self.reward_function["theta"],
             self.context
         )
-        print(self.true_expected_rewards.shape)
 

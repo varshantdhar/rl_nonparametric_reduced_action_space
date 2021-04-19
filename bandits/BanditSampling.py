@@ -136,7 +136,6 @@ class BanditSampling(Bandit):
             t += 1
 
         print("Finished running bandit")
-        print(self.context.shape, self.rewards.shape)
 
         # reonfigure
         self.actions = self.actions[:, :(t-1)]
@@ -151,6 +150,7 @@ class BanditSampling(Bandit):
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret
+        print(self.true_expected_rewards.shape, self.rewards.shape)
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print(self.cumregrets)
