@@ -118,6 +118,7 @@ class MCMCPosterior(object):
             # Ready to start Gibbs
             n_iter=1
             (XcondZ_loglik[n_iter], Z_loglik[n_iter])=self.compute_loglikelihood(a, z_a, N_ak, x_a, y_a)
+            
             # print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
         
             # Iterate while not converged or not max iterations
