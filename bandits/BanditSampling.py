@@ -138,14 +138,14 @@ class BanditSampling(Bandit):
         print("Finished running bandit")
 
         # reonfigure
-        self.actions = self.actions[:, :t]
-        self.rewards = self.rewards[:, :t]
-        self.rewards_expected = self.rewards_expected[:, :t]
+        self.actions = self.actions[:, :(t-1)]
+        self.rewards = self.rewards[:, :(t-1)]
+        self.rewards_expected = self.rewards_expected[:, :(t-1)]
         self.arm_predictive_density = {
-            "mean": self.arm_predictive_density["mean"][:, :t],
-            "var": self.arm_predictive_density["var"][:, :t]
+            "mean": self.arm_predictive_density["mean"][:, :(t-1)],
+            "var": self.arm_predictive_density["var"][:, :(t-1)]
         }
-        self.arm_N_samples = self.arm_N_samples[:t] 
+        self.arm_N_samples = self.arm_N_samples[:(t-1)] 
 
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
