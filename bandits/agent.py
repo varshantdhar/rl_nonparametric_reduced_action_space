@@ -26,7 +26,7 @@ def action_segments():
 	return coords, A
 
 class QLearning_Agent(object):
-	def ___init____(self):
+	def __init__(self):
 		self.q_learning_rewards = []
 		self.QLearning_Buffer = {}
 
