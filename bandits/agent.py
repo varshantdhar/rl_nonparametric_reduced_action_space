@@ -42,7 +42,7 @@ class QLearning_Agent(object):
 		num_actions = len(actions)
 		print(context.shape)
 		context_size = context.shape[0]
-		context_dim = context_size * context_shape[1]
+		context_dim = context_size * context.shape[1]
 		action_dim = 7
 		val_model = DQN.Q_NN_multidim(context_dim, 7, num_actions, num_hidden=10)
 		targ_model = DQN.Q_NN_multidim(context_dim, 7, num_actions, num_hidden=10)
