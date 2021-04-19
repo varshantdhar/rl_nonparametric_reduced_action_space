@@ -27,6 +27,8 @@ def ql(env, agent, context, frame_count, running_rewards):
     running_rewards.append(reward)
     if reward > 0:
         print(frame_count, time.process_time() - start_time, reward)
+    if reward < 0:
+        env.reset()
     return (reward, running_rewards)
 
 class SAValueNN(nn.Module):
