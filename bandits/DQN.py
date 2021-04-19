@@ -18,8 +18,7 @@ def get_reward(env, agent, context):
     agent.epsilon *= 0.99
     # while not done:
     values, action_ind = agent.get_action(state)
-    action = agent.choose_action(action_ind)
-    print(action)
+    action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
     reward = env.step(action, 1)
     # next_state = agent.get_state(torch.Tensor(obs))
         
@@ -123,7 +122,6 @@ class Q_Learning:
         sample actions given a state and action space
         """
         q_values = self.value_model(state.unsqueeze(0))
-        print(self.random_sample())
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[1]), rand_ind], rand_ind
