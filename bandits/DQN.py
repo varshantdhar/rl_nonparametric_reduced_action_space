@@ -8,14 +8,14 @@ import time
 device = "cpu"
 
 
-def train(env, agent, context):
+def get_reward(env, agent, context):
     frame_count = 0
     running_rewards = []
     # for i in range(n_epoch):
     start_time = time.process_time()
     done = False
     state = agent.init_state(torch.Tensor(context))
-    # agent.epsilon *= 0.99
+    agent.epsilon *= 0.99
     # while not done:
     values, action_ind = agent.get_action(state)
     reward = env.step(agent.choose_action(action_ind), 1)

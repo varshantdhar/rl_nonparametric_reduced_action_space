@@ -46,4 +46,4 @@ class QLearning_Agent(object):
 		targ_model = DQN.Q_NN_multidim(context_dim, 7, num_disc_steps, num_hidden=20)
 		learner = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, 
 			state_size=context_dim, history_len=3, buffer_size=5000)
-		return DQN.train(env, learner, context[:,t])
+		return DQN.get_reward(env, learner, context[:,t])
