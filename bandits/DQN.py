@@ -162,7 +162,7 @@ class Q_Learning:
         self.optimizer.step()
     
     def choose_action(self, action_ind):
-        return self.action_space[range(self.action_space.shape[0]), action_ind]
+        return self.action_space[action_ind,range(self.action_space.shape[1])]
     
     def train_step(self, frame_count):
         states, next_states, action_ind, rewards, done_flags = self.replay_buffer.sample_batch(self.batch_size)
