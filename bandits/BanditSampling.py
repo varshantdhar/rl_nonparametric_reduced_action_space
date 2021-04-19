@@ -143,6 +143,7 @@ class BanditSampling(Bandit):
             t += 1
 
         print("Finished running bandit")
+        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
         # reonfigure
         self.context = self.context[:, :t]
