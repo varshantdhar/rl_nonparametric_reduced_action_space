@@ -123,10 +123,10 @@ class Q_Learning:
         sample actions given a state and action space
         """
         q_values = self.value_model(state.unsqueeze(0))
-        print(q_values.shape)
+        print(self.random_sample())
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
-            return q_values[:, range(self.action_space.shape[0]), rand_ind], rand_ind
+            return q_values[:, range(self.action_space.shape[1]), rand_ind], rand_ind
         
         # otherwise, compute value for each of these actions
         best_values, best_action_inds = torch.max(q_values, dim=2)
