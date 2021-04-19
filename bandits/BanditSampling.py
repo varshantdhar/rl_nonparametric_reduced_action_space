@@ -60,7 +60,6 @@ class BanditSampling(Bandit):
             # Contextual bandit
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
-            env.reset()
 
             self.execute(t_max, env)
 
@@ -99,6 +98,7 @@ class BanditSampling(Bandit):
         val_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
         targ_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
         dqn_agent = agent.QLearning_Agent()
+        env.reset()
 
         while env.is_running():
 
@@ -138,6 +138,8 @@ class BanditSampling(Bandit):
                 self.update_reward_posterior(t)
             print(t)
             t += 1
+            
+        print("Finished running bandit")
 
         # reonfigure
         self.actions = self.actions[:, :t]
@@ -149,7 +151,6 @@ class BanditSampling(Bandit):
         }
         self.arm_N_samples = self.arm_N_samples[:t] 
 
-        print("Finished running bandit")
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret
