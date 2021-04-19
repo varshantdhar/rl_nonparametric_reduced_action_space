@@ -18,6 +18,11 @@ def ql(env, agent, context, frame_count, running_rewards):
     values, action_ind = agent.get_action(state)
     action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
     reward = env.step(action, num_steps=4)
+    if not env.is_running():
+        print("Episode done")
+        running_rewards = 0
+        env.reset()
+        return (reward, running_rewards)
     next_context = env.observations()["RGB_INTERLEAVED"].flatten()
     next_state = agent.get_state(torch.Tensor(next_context))
         
