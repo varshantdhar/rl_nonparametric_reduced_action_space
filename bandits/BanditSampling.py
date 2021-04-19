@@ -145,17 +145,6 @@ class BanditSampling(Bandit):
         print("Finished running bandit")
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
-        # reonfigure
-        self.context = self.context[:, :t]
-        self.actions = self.actions[:, :t]
-        self.rewards = self.rewards[:, :t]
-        self.rewards_expected = self.rewards_expected[:, :t]
-        self.arm_predictive_density = {
-            "mean": self.arm_predictive_density["mean"][:, :t],
-            "var": self.arm_predictive_density["var"][:, :t]
-        }
-        self.arm_N_samples = self.arm_N_samples[:t] 
-
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
         # Compute regret
