@@ -127,6 +127,7 @@ class BanditSampling(Bandit):
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
+                print("Made it here")
                 self.update_reward_posterior(t)
 
         print("Finished running bandit")
