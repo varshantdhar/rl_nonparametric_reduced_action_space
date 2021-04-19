@@ -38,9 +38,8 @@ class QLearning_Agent(object):
 		return a_list
 
 	def step(self, a, t, context, env):
-		# actions = torch.Tensor(self.action_list(a))
-		actions = torch.linspace(-1, 1, 72).unsqueeze(0).repeat(4, 1)
-		# num_actions = len(actions)
+		actions = torch.Tensor(self.action_list(a))
+		num_actions = len(actions)
 		print(actions)
 		context_size = context.shape[0]
 		action_dim = 7
