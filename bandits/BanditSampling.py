@@ -134,7 +134,6 @@ class BanditSampling(Bandit):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
             else:
-                print(self.rewards[action, t])
                 # Update parameter posterior
                 self.update_reward_posterior(t)
 
