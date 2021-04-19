@@ -60,6 +60,7 @@ class BanditSampling(Bandit):
             # Contextual bandit
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
+            env.reset()
 
             self.execute(t_max, env)
 
@@ -84,7 +85,7 @@ class BanditSampling(Bandit):
         self.rewards_expected = np.zeros((self.A, t_max))
         self.arm_predictive_density = {
             "mean": np.zeros((self.A, t_max)),
-            "var": np.zeros((self.A, t_max)),
+            "var": np.zeros((self.A, t_max))
         }
         self.arm_N_samples = np.ones(t_max)
 
@@ -99,12 +100,11 @@ class BanditSampling(Bandit):
         targ_model = DQN.Q_NN_multidim(self.d_context, action_dim, num_actions, num_hidden=10)
         dqn_agent = agent.QLearning_Agent()
 
-        for t in np.arange(t_max):
+        while env.is_running():
 
+        # for t in np.arange(t_max):
+            t = 0
 
-            if not env.is_running():
-                print("Environment stopped early")
-                env.reset()
             context_ = env.observations()["RGB_INTERLEAVED"].flatten()
             self.context[:,t] = context_
 
@@ -136,6 +136,17 @@ class BanditSampling(Bandit):
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
+            t += 1
+
+        # reonfigure
+        self.actions = self.actions[:, :t]
+        self.rewards = self.rewards[:, :t]
+        self.rewards_expected = self.rewards_expected[:, :t]
+        self.arm_predictive_density = {
+            "mean": self.arm_predictive_density["mean"][:, :t],
+            "var": self.arm_predictive_density["var"][:, :t]
+        }
+        self.arm_N_samples = self.arm_N_samples[:t] 
 
         print("Finished running bandit")
         # Compute expected rewards with true function
@@ -143,6 +154,7 @@ class BanditSampling(Bandit):
         # Compute regret
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
+        print(self.cumregrets)
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
