@@ -23,6 +23,7 @@ def ql(env, agent, context, frame_count, running_rewards):
     next_state = agent.get_state(torch.Tensor(next_context))
         
     agent.replay_buffer.add_sample(state, action_ind, reward, next_state, False)
+    print(state, action, next_state, reward)
     agent.train_step(frame_count)
     running_rewards.append(reward)
     if reward > 0:
