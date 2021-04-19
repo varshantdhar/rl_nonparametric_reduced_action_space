@@ -186,7 +186,7 @@ class MCMCPosterior(object):
                     
         # TODO: Add other reward/prior combinations
         
-        print('update_reward_posterior at t={} in {}'.format(t,time.process_time()-t_init))
+        # print('update_reward_posterior at t={} in {}'.format(t,time.process_time()-t_init))
             
     def update_reward_posterior_params(self, how, a, k, x, y):
     
