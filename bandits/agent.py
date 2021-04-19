@@ -40,7 +40,6 @@ class QLearning_Agent(object):
 	def step(self, a, t, context, env):
 		actions = torch.Tensor(self.action_list(a))
 		num_actions = len(actions)
-		print(actions)
 		context_size = context.shape[0]
 		action_dim = 7
 		val_model = DQN.Q_NN_multidim(context_size, 7, num_actions, num_hidden=10)

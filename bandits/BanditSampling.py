@@ -125,7 +125,6 @@ class BanditSampling(Bandit):
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
-                print("No reward yet")
             else:
                 # Update parameter posterior
                 self.update_reward_posterior(t)
