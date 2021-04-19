@@ -85,7 +85,7 @@ if __name__ == "__main__":
     env = deepmind_lab.Lab(
         "seekavoid_arena_01",
         ["RGB_INTERLEAVED"],
-        config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
+        config={"fps": "60", "width":"8", "height":"8"}
     )
     env.reset()
 
