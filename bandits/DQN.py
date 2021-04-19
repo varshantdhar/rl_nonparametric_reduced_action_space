@@ -120,13 +120,10 @@ class Q_Learning:
         
     def get_action(self, state):
         """
-        End goal:
         sample actions given a state and action space
-            action space might be a list of actions
-        how to define action space?
-            maybe easiest is a list of values (since this is a continuous action space)
         """
         q_values = self.value_model(state.unsqueeze(0))
+        print(q_values)
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[0]), rand_ind], rand_ind
