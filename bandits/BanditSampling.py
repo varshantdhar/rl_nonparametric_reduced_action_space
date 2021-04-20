@@ -145,7 +145,7 @@ class BanditSampling(Bandit):
                 self.update_reward_posterior(t)
             t += 1
 
-        print("Finished running bandit")
+        print("Finished running bandit at iteration {}". format(t))
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
         # Compute expected rewards with true function
