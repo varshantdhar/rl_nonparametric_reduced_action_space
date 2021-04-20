@@ -119,7 +119,7 @@ class MCMCPosterior(object):
             n_iter=1
             (XcondZ_loglik[n_iter], Z_loglik[n_iter])=self.compute_loglikelihood(a, z_a, N_ak, x_a, y_a)
 
-            print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
+            # print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
         
             # Iterate while not converged or not max iterations
             while (n_iter < self.reward_prior['gibbs_max_iter'] and abs((XcondZ_loglik[n_iter]+Z_loglik[n_iter]) - (XcondZ_loglik[n_iter-1]+Z_loglik[n_iter-1])) >= (self.reward_prior['gibbs_loglik_eps']*abs((XcondZ_loglik[n_iter-1]+Z_loglik[n_iter-1])))):
@@ -180,14 +180,14 @@ class MCMCPosterior(object):
 
                 # Compute loglikelihood
                 (XcondZ_loglik[n_iter], Z_loglik[n_iter])=self.compute_loglikelihood(a, z_a, N_ak, x_a, y_a)
-                print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
+                # print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
                 
             # Final assignments
             self.reward_posterior['Z'][a,t_a]=z_a
                     
         # TODO: Add other reward/prior combinations
         
-        print('update_reward_posterior at t={} in {}'.format(t,time.process_time()-t_init))
+        # print('update_reward_posterior at t={} in {}'.format(t,time.process_time()-t_init))
             
     def update_reward_posterior_params(self, how, a, k, x, y):
     

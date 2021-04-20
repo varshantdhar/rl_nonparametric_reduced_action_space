@@ -129,7 +129,6 @@ class Q_Learning:
             maybe easiest is a list of values (since this is a continuous action space)
         """
         q_values = self.value_model(state.unsqueeze(0))
-        print(q_values.shape)
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
             return q_values[:, range(self.action_space.shape[0]), rand_ind], rand_ind
