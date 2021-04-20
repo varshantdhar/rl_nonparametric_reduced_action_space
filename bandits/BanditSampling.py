@@ -140,10 +140,10 @@ class BanditSampling(Bandit):
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
-                print('Reward {} obtained for iteration {}'.format(self.rewards[action, t], t))
+                if self.rewards[action, t] > 0:
+                    print('Reward {} obtained for iteration {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
             t += 1
-            print("--- %s seconds ---" % (time.time() - start_time))
 
         print("Finished running bandit")
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
