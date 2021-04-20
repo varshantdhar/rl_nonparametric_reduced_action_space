@@ -137,14 +137,14 @@ class BanditSampling(Bandit):
                 print("Running DQN to select action from action set")
             self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
 
-            if self.rewards[action, t] > 0:
-                # Update parameter posterior
-                print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
-                self.update_reward_posterior(t)
-            # else:
+            if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
-                # self.actions[action, t] = 0.0
-                    
+                self.actions[action, t] = 0.0
+            else:
+                # Update parameter posterior
+                if self.rewards[action, t] > 0:
+                    print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
+                self.update_reward_posterior(t)
             t += 1
 
         print("Finished running bandit at iteration {}". format(t))
