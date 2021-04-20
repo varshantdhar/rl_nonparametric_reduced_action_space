@@ -141,7 +141,7 @@ class BanditSampling(Bandit):
                 # Update parameter posterior
                 print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
-            else:
+            # else:
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 # self.actions[action, t] = 0.0
                     
