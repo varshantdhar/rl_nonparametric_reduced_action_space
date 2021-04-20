@@ -216,7 +216,9 @@ class MCMCPosterior(object):
             prior = self.reward_posterior['beta'][a,k]
             # Update beta
             self.reward_posterior['beta'][a,k]-=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
-            print(prior, self.reward_posterior['beta'][a,k])
+            post = self.reward_posterior['beta'][a,k]
+            if post <= 0:
+                print(prior, post, np.linalg.eigvals(self.reward_posterior['Sigma'][a]), self.reward_posterior['theta'][a,k])
         else:
             raise ValueError('Unknown posterior parameter update type={}'.format(how))
         
