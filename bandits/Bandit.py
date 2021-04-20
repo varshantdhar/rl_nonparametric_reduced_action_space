@@ -87,6 +87,6 @@ class Bandit(abc.ABC, object):
             "ak,akd,dt->at",
             self.reward_function["pi"],
             self.reward_function["theta"],
-            self.context,
+            self.context
         )
 

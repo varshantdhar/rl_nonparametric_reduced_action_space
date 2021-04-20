@@ -27,7 +27,7 @@ def action_segments():
 
 class QLearning_Agent(object):
 	def __init__(self):
-		self.q_learning_rewards = []
+		self.q_learning_rewards = 0
 		self.QLearning_Buffer = {}
 
 	def action_list(self, a, val_model, targ_model):
@@ -42,7 +42,7 @@ class QLearning_Agent(object):
 		return a_list
 
 	def step(self, a, t, context, env, val_model, targ_model):
-		actions = torch.Tensor(self.action_list(a, val_model, targ_model))
+		actions = torch.transpose(torch.Tensor(self.action_list(a, val_model, targ_model)),0,1)
 		context_size = context.shape[0]
 		if str(a) not in self.QLearning_Buffer.keys():
 			self.QLearning_Buffer[str(a)] = DQN.Q_Learning(0.5, 0.99, val_model, targ_model, actions, context_size, history_len=1)

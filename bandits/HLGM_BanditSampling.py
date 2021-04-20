@@ -67,8 +67,8 @@ if __name__ == "__main__":
 
     coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
     rewards = 0
-    R = 2 # Number of realizations to run
-    t_max = 10 # Time-instants to run the bandit
+    R = 100 # Number of realizations to run
+    t_max = 1000 # Time-instants to run the bandit
     width = 8
     height = 8
     d_context = width * height * 3 # Context dimension
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     bandit = get_bandit(A, K, pi, theta, sigma, prior_K, d_context)
 
     env = deepmind_lab.Lab(
-        "tests/empty_room_test",
+        "seekavoid_arena_01",
         ["RGB_INTERLEAVED"],
-        config={"fps": "60", "controls": "external", "width":"8", "height":"8"}
+        config={"fps": "60", "width":"8", "height":"8"}
     )
     env.reset()
 

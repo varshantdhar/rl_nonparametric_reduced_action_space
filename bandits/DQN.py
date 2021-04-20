@@ -9,7 +9,6 @@ device = "cpu"
 
 
 def ql(env, agent, context, frame_count, running_rewards):
-    running_rewards = []
     # for i in range(n_epoch):
     start_time = time.process_time()
     done = False
@@ -18,14 +17,21 @@ def ql(env, agent, context, frame_count, running_rewards):
     # while not done:
     values, action_ind = agent.get_action(state)
     action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
-    reward = env.step(action, 1)
+    reward = env.step(action, num_steps=1)
+    if not env.is_running():
+        running_rewards = 0
+        done = True
+        agent.replay_buffer.add_sample(state, action_ind, reward, state, done)
+        agent.train_step(frame_count)
+        return (reward, running_rewards)
     next_context = env.observations()["RGB_INTERLEAVED"].flatten()
     next_state = agent.get_state(torch.Tensor(next_context))
         
-    agent.replay_buffer.add_sample(state, action_ind, reward, next_state, False)
+    agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
     agent.train_step(frame_count)
-    running_rewards.append(reward)
-    print(frame_count, time.process_time() - start_time, reward)
+    if reward > 0:
+        running_rewards += reward
+        print('Score (cumulative rewards): {} '.format(running_rewards))
     return (reward, running_rewards)
 
 class SAValueNN(nn.Module):
@@ -93,7 +99,7 @@ class ReplayBuffer:
         
 class Q_Learning:
     def __init__(self, epsilon, gamma, value_model, target_model, action_space, state_size, state_scaling=100,
-                history_len=3, buffer_size=1000, batch_size=128):
+                history_len=3, buffer_size=1000, batch_size=128 ):
         self.epsilon = epsilon
         self.gamma = gamma
         self.value_model = value_model
@@ -113,16 +119,20 @@ class Q_Learning:
         
     def random_sample(self):
         # for now, assume action space is a vector of actions
-        return torch.LongTensor([random.randrange(self.action_space.shape[0]) for _ in range(self.action_space.shape[1])])
+        return torch.LongTensor([random.randrange(self.action_space.shape[1]) for _ in range(self.action_space.shape[0])])
         
     def get_action(self, state):
         """
+        End goal:
         sample actions given a state and action space
+            action space might be a list of actions
+        how to define action space?
+            maybe easiest is a list of values (since this is a continuous action space)
         """
         q_values = self.value_model(state.unsqueeze(0))
         if np.random.random() < self.epsilon:
             rand_ind = self.random_sample()
-            return q_values[:, range(self.action_space.shape[1]), rand_ind], rand_ind
+            return q_values[:, range(self.action_space.shape[0]), rand_ind], rand_ind
         
         # otherwise, compute value for each of these actions
         best_values, best_action_inds = torch.max(q_values, dim=2)
@@ -148,8 +158,8 @@ class Q_Learning:
         
         q_target = rewards + ~done_flags*self.gamma*max_target_vals
 
-        q_taken = q_values.view(128*4, -1)[range(128*4), action_taken_ind.view(128*4)]
-        q_target = q_target.view(128*4)
+        q_taken = q_values.view(224*4, -1)[range(224*4), action_taken_ind.view(224*4)]
+        q_target = q_target.view(224*4)
         return torch.nn.functional.mse_loss(q_taken, q_target)
     
     def update(self, loss):
@@ -157,7 +167,7 @@ class Q_Learning:
         self.optimizer.step()
     
     def choose_action(self, action_ind):
-        return self.action_space[action_ind,range(self.action_space.shape[1])]
+        return self.action_space[range(self.action_space.shape[0]), action_ind]
     
     def train_step(self, frame_count):
         states, next_states, action_ind, rewards, done_flags = self.replay_buffer.sample_batch(self.batch_size)
