@@ -213,7 +213,7 @@ class MCMCPosterior(object):
             self.reward_posterior['theta'][a,k]=np.einsum('ab,b->a', self.reward_posterior['Sigma'][a,k],(np.einsum('ab,b->a',sigma_inv, self.reward_posterior['theta'][a,k])-x*y))
             # Update alpha
             self.reward_posterior['alpha'][a,k]-=1/2
-            print(self.reward_posterior['beta'][a,k], self.reward_posterior['theta'][a,k], self.reward_posterior['Sigma'][a,k], x)
+            print(self.reward_posterior['beta'][a,k], self.reward_posterior['Sigma'][a,k], x)
             # Update beta
             self.reward_posterior['beta'][a,k]-=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
         else:
