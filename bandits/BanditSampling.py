@@ -137,6 +137,9 @@ class BanditSampling(Bandit):
                 print("Running DQN to select action from action set")
             self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
 
+            if not env.is_running():
+                print(rewards[action,t])
+
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
