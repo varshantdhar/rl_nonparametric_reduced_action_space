@@ -205,6 +205,7 @@ class MCMCPosterior(object):
             self.reward_posterior['theta'][a,k]=np.einsum('ab,b->a', self.reward_posterior['Sigma'][a,k],(x*y+np.einsum('ab,b->a',sigma_inv, self.reward_posterior['theta'][a,k])))
         
         elif how == 'del':
+            print("Checking delete ")
             # Sigma inverse
             sigma_inv=np.linalg.inv(self.reward_posterior['Sigma'][a,k])
             # Update regressor covariance (V)
@@ -218,12 +219,12 @@ class MCMCPosterior(object):
         else:
             raise ValueError('Unknown posterior parameter update type={}'.format(how))
         
+        # Doublecheck posterior update makes sense
         # Positive inverse gamma parameters
-        e = 0.00001
-        self.reward_posterior['alpha'][a] = np.where(self.reward_posterior['alpha'][a]<=0., e, self.reward_posterior['alpha'][a])
-        self.reward_posterior['beta'][a] = np.where(self.reward_posterior['beta'][a]<=0., e, self.reward_posterior['beta'][a])
+        assert np.all(self.reward_posterior['alpha'][a]>0.)
+        assert np.all(self.reward_posterior['beta'][a]>0.)
         # Positive definite Sigma
-        self.reward_posterior['Sigma'][a] = np.where(self.reward_posterior['Sigma'][a]<=0., e, self.reward_posterior['Sigma'][a])
+        assert np.all(np.linalg.eigvals(self.reward_posterior['Sigma'][a])>.0)
             
     def compute_ylikelihood_per_mixture(self, a, x, y):
         # Sufficient statistics of posterior
