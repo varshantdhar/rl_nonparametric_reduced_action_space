@@ -36,7 +36,7 @@ class MCMCPosterior(object):
         self.reward_posterior={'alpha': copy.deepcopy(self.reward_prior['alpha'][:,None]), 'beta': copy.deepcopy(self.reward_prior['beta'][:,None]), 'theta': copy.deepcopy(self.reward_prior['theta'][:,None,:]),'Sigma': copy.deepcopy(self.reward_prior['Sigma'][:,None,::]), 'K':np.zeros(self.A, dtype=int)}
 
         # Assignments to mixtures matrix
-        self.reward_posterior['Z']=np.nan*np.ones((self.A, self.rewards.shape[1]))
+        self.reward_posterior['Z']=np.zeros((self.A, self.rewards.shape[1]))
                  
     def update_reward_posterior(self, t):
         """ Update the posterior of the reward density, based on available information at time t
