@@ -69,8 +69,8 @@ if __name__ == "__main__":
     rewards = 0
     R = 300 # Number of realizations to run
     t_max = 300 # Time-instants to run the bandit
-    width = 8
-    height = 8
+    width = 10
+    height = 10
     d_context = width * height * 3 # Context dimension
 
     K = 5 # Number of mixtures per arm of the bandit
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     env = deepmind_lab.Lab(
         "seekavoid_arena_01",
         ["RGB_INTERLEAVED"],
-        config={"fps": "60", "width":"8", "height":"8"}
+        config={"fps": "60", "width":width, "height":height}
     )
     env.reset()
 
