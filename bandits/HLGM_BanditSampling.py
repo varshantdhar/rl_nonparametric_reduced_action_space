@@ -28,10 +28,10 @@ def get_bandit(A, K, pi, theta, sigma, prior_K, d_context):
 	gibbs_loglik_eps=0.01
 
 	########## Priors
-	gamma=0.5
-	alpha=1.5
-	beta=1.5
-	sigma=1.5
+	gamma=0.3
+	alpha=1.
+	beta=1.
+	sigma=1.
 	pitman_yor_d=0.1
 	assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
 
@@ -73,8 +73,8 @@ if __name__ == "__main__":
     height = 8
     d_context = width * height * 3 # Context dimension
 
-    K = 2 # Number of mixtures per arm of the bandit
-    prior_K = 2  # Assumed prior number of mixtures (per arm)
+    K = 5 # Number of mixtures per arm of the bandit
+    prior_K = 5  # Assumed prior number of mixtures (per arm)
     pi = np.random.rand(A, K)  
     pi = pi / pi.sum(axis=1, keepdims=True) # Mixture proportions per arm
     theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
