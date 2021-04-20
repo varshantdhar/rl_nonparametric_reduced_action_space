@@ -16,18 +16,19 @@ def ql(env, agent, context, frame_count, running_rewards):
     agent.epsilon *= 0.99
     # while not done:
     values, action_ind = agent.get_action(state)
-    action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
-    reward = env.step(action, num_steps=1)
+    action_chosen = agent.choose_action(action_ind)
+    action = np.array(action_chosen.numpy(), dtype=np.intc)
+    reward = env.step(action, num_steps=4)
     if not env.is_running():
         running_rewards = 0
         done = True
-        agent.replay_buffer.add_sample(state, action, reward, state, done)
+        agent.replay_buffer.add_sample(state, action_chosen, reward, state, done)
         agent.train_step(frame_count)
         return (reward, running_rewards)
     next_context = env.observations()["RGB_INTERLEAVED"].flatten()
     next_state = agent.get_state(torch.Tensor(next_context))
         
-    agent.replay_buffer.add_sample(state, action, reward, next_state, done)
+    agent.replay_buffer.add_sample(state, action_chosen, reward, next_state, done)
     agent.train_step(frame_count)
     if reward > 0:
         running_rewards += reward
