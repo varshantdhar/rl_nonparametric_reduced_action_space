@@ -21,13 +21,13 @@ def ql(env, agent, context, frame_count, running_rewards):
     if not env.is_running():
         running_rewards = 0
         done = True
-        agent.replay_buffer.add_sample(state, action_ind, reward, state, done)
+        agent.replay_buffer.add_sample(state, action, reward, state, done)
         agent.train_step(frame_count)
         return (reward, running_rewards)
     next_context = env.observations()["RGB_INTERLEAVED"].flatten()
     next_state = agent.get_state(torch.Tensor(next_context))
         
-    agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
+    agent.replay_buffer.add_sample(state, action, reward, next_state, done)
     agent.train_step(frame_count)
     if reward > 0:
         running_rewards += reward
