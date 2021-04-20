@@ -28,11 +28,11 @@ def get_bandit(A, K, pi, theta, sigma, prior_K, d_context):
 	gibbs_loglik_eps=0.01
 
 	########## Priors
-	gamma=0.1
-	alpha=1.
-	beta=1.
-	sigma=1.
-	pitman_yor_d=0
+	gamma=0.5
+	alpha=1.5
+	beta=1.5
+	sigma=1.5
+	pitman_yor_d=0.1
 	assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
 
 	thompsonSampling={'arm_N_samples':1}
