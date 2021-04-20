@@ -16,7 +16,7 @@ def ql(env, agent, context, frame_count, running_rewards):
     # while not done:
     values, action_ind = agent.get_action(state)
     action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
-    reward = (env.step(action, num_steps=4) * 10) + 1
+    reward = env.step(action, num_steps=4)
     if not env.is_running():
         running_rewards = 0
         done = True
@@ -28,7 +28,7 @@ def ql(env, agent, context, frame_count, running_rewards):
         
     agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
     agent.train_step(frame_count)
-    if reward > 1:
+    if reward > 0:
         running_rewards += reward
         print('Score (cumulative rewards): {} '.format(running_rewards))
     return (reward, running_rewards)
