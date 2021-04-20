@@ -218,12 +218,12 @@ class MCMCPosterior(object):
         else:
             raise ValueError('Unknown posterior parameter update type={}'.format(how))
         
-        # Doublecheck posterior update makes sense
         # Positive inverse gamma parameters
-        assert np.all(self.reward_posterior['alpha'][a]>0.)
-        assert np.all(self.reward_posterior['beta'][a]>0.)
+        e = 0.00001
+        self.reward_posterior['alpha'][a] = np.where(self.reward_posterior['alpha'][a]<=0., e, self.reward_posterior['alpha'][a])
+        self.reward_posterior['beta'][a] = np.where(self.reward_posterior['beta'][a]<=0., e, self.reward_posterior['beta'][a])
         # Positive definite Sigma
-        assert np.all(np.linalg.eigvals(self.reward_posterior['Sigma'][a])>.0)
+        self.reward_posterior['Sigma'][a] = np.where(self.reward_posterior['Sigma'][a]<=0., e, self.reward_posterior['Sigma'][a])
             
     def compute_ylikelihood_per_mixture(self, a, x, y):
         # Sufficient statistics of posterior
