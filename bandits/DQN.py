@@ -10,7 +10,6 @@ device = "cpu"
 
 def ql(env, agent, context, frame_count, running_rewards):
     # for i in range(n_epoch):
-    start_time = time.process_time()
     done = False
     state = agent.init_state(torch.Tensor(context))
     agent.epsilon *= 0.99

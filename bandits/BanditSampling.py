@@ -3,8 +3,10 @@
 # Imports: python modules
 # Imports: other modules
 from Bandit import *
+
 import DQN
 import agent
+import time
 
 class BanditSampling(Bandit):
     """Abstract class for bandits with sampling policies
@@ -105,6 +107,7 @@ class BanditSampling(Bandit):
         t = 0
 
         while env.is_running() and t < t_max:
+            start_time = time.time()
             context_ = env.observations()["RGB_INTERLEAVED"].flatten()
             self.context[:,t] = context_
 
@@ -137,10 +140,10 @@ class BanditSampling(Bandit):
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
-                if self.rewards[action, t] > 0:
-                    print('Reward obtained {} for iteration {}'.format(self.rewards[action, t], t))
+                print('Reward {} obtained for iteration {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
             t += 1
+            print("--- %s seconds ---" % (time.time() - start_time))
 
         print("Finished running bandit")
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
