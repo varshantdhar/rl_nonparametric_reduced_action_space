@@ -28,7 +28,7 @@ def ql(env, agent, context, frame_count, running_rewards):
         
     agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
     agent.train_step(frame_count)
-    if reward > 0:
+    if reward != 0:
         running_rewards += reward
         print('Score (cumulative rewards): {} '.format(running_rewards))
     return (reward, running_rewards)
