@@ -17,6 +17,7 @@ def ql(env, agent, context, frame_count, running_rewards):
     # while not done:
     values, action_ind = agent.get_action(state)
     action_chosen = agent.choose_action(action_ind)
+    print(action_chosen.shape, action_ind.shape)
     action = np.array(action_chosen.numpy(), dtype=np.intc)
     reward = env.step(action, num_steps=4)
     if not env.is_running():
