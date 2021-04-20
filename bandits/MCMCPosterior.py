@@ -205,7 +205,6 @@ class MCMCPosterior(object):
             self.reward_posterior['theta'][a,k]=np.einsum('ab,b->a', self.reward_posterior['Sigma'][a,k],(x*y+np.einsum('ab,b->a',sigma_inv, self.reward_posterior['theta'][a,k])))
         
         elif how == 'del':
-            print("Checking delete ")
             # Sigma inverse
             sigma_inv=np.linalg.inv(self.reward_posterior['Sigma'][a,k])
             # Update regressor covariance (V)
