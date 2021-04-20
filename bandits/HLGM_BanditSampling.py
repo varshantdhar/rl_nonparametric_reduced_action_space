@@ -69,8 +69,8 @@ if __name__ == "__main__":
     rewards = 0
     R = 100 # Number of realizations to run
     t_max = 300 # Time-instants to run the bandit
-    width = 12
-    height = 12
+    width = 8
+    height = 8
     d_context = width * height * 3 # Context dimension
 
     K = 5 # Number of mixtures per arm of the bandit
