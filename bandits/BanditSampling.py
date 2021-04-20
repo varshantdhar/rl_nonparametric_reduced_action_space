@@ -71,7 +71,9 @@ class BanditSampling(Bandit):
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
 
+            start_time = time.time()
             self.execute(t_max, env, val_model, targ_model, dqn_agent)
+            print("Realization took %s seconds" % (time.time() - start_time))
 
             self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
             self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
