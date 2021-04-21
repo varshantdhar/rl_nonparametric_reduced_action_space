@@ -67,14 +67,14 @@ if __name__ == "__main__":
 
     coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
     rewards = 0
-    R = 100 # Number of realizations to run
+    R = 300 # Number of realizations to run
     t_max = 300 # Time-instants to run the bandit
     width = 8
     height = 8
     d_context = width * height * 3 # Context dimension
 
-    K = 3 # Number of mixtures per arm of the bandit
-    prior_K = 3  # Assumed prior number of mixtures (per arm)
+    K = 5 # Number of mixtures per arm of the bandit
+    prior_K = 5  # Assumed prior number of mixtures (per arm)
     pi = np.random.rand(A, K)  
     pi = pi / pi.sum(axis=1, keepdims=True) # Mixture proportions per arm
     theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
