@@ -7,6 +7,7 @@ from Bandit import *
 import DQN
 import agent
 import time
+import pickle 
 
 class BanditSampling(Bandit):
     """Abstract class for bandits with sampling policies
@@ -148,7 +149,7 @@ class BanditSampling(Bandit):
             t += 1
 
         print("Finished running bandit at iteration {}". format(t))
-        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
+        
 
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
@@ -156,6 +157,11 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
+        dict_store = {'Rewards for Episodes': dqn_agent.q_learning_rewards, 'Cumulative Regrets': self.cumregrets[-1]}
+        outfile = open('HLGM_performance','wb')
+        pickle.dump(dict_store,outfile)
+        outfile.close()
+        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
