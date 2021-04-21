@@ -8,6 +8,7 @@ import scipy.stats as stats
 import time
 import matplotlib.pyplot as plt
 import pdb
+import pickle
 
 ######## Class definition ########
 class MCMCPosterior(object):
