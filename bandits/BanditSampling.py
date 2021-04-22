@@ -157,10 +157,10 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
-        dict_store = {'Rewards for Episodes': dqn_agent.q_learning_rewards, 'Cumulative Regrets': self.cumregrets[-1]}
-        outfile = open('HLGM_performance_','ab+')
-        pickle.dump(dict_store,outfile)
-        outfile.close()
+        # dict_store = {'Rewards for Episodes': dqn_agent.q_learning_rewards, 'Cumulative Regrets': self.cumregrets[-1]}
+        # outfile = open('HLGM_performance_','ab+')
+        # pickle.dump(dict_store,outfile)
+        # outfile.close()
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
