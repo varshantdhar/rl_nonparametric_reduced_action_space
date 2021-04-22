@@ -72,9 +72,7 @@ class BanditSampling(Bandit):
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
 
-            start_time = time.time()
             self.execute(t_max, env, val_model, targ_model, dqn_agent)
-            print("Realization took %s seconds" % (time.time() - start_time))
 
             self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
             self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
@@ -108,6 +106,7 @@ class BanditSampling(Bandit):
         print("Running bandit to select action set")
         env.reset()
         t = 0
+        start_time = time.time()
 
         while env.is_running() and t < t_max:
             start_time = time.time()
@@ -157,10 +156,10 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
-        # dict_store = {'Rewards for Episodes': dqn_agent.q_learning_rewards, 'Cumulative Regrets': self.cumregrets[-1]}
-        # outfile = open('HLGM_performance_','ab+')
-        # pickle.dump(dict_store,outfile)
-        # outfile.close()
+        dict_store = {'rewards': dqn_agent.q_learning_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
+        outfile = open('HLGM_performance_coarse','ab+')
+        pickle.dump(dict_store,outfile)
+        outfile.close()
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
