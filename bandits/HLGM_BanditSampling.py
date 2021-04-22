@@ -66,6 +66,7 @@ if __name__ == "__main__":
     deepmind_lab.set_runfiles_path(path)
 
     coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
+    print(A)
     rewards = 0
     R = 300 # Number of realizations to run
     t_max = 300 # Time-instants to run the bandit
