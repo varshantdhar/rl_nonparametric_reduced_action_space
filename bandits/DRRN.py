@@ -244,6 +244,7 @@ class DRRN_Agent:
 
         # Compute Q(s', a') for all a'
         # TODO: Use a target network???
+        print(batch)
         _, next_qvals = self.target_network.act(batch.next_state, batch.next_acts)
         # Take the max over next q-values
         next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
