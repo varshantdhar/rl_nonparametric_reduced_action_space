@@ -212,7 +212,7 @@ class DRRN_Agent:
         action_ids, action_idxs, _ = self.act(state, actions)
         # self.action_space[range(self.action_space.shape[0]), action_ind]
         action_val = [action[idx] for action, idx in zip(actions, action_idxs)]
-        print(action_val)
+        # print(action_val)
         action = np.array(action_val.numpy(), dtype=np.intc)
         reward = env.step(action, num_steps=4)
         return (reward, action)
@@ -235,6 +235,7 @@ class DRRN_Agent:
     def act(self, state, poss_acts, sample=True):
         """ Returns a string action from poss_acts. """
         idxs, values = self.network.act(state, poss_acts, sample)
+        print(idxs, values)
         act_ids = [poss_acts[batch][idx] for batch, idx in enumerate(idxs)]
         return act_ids, idxs, values
 
