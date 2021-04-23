@@ -173,7 +173,7 @@ class DRRN(torch.nn.Module):
         """ Returns an action-string, optionally sampling from the distribution
             of Q-Values.
         """
-        q_values = self.forward(state, act_ids)
+        q_values = tensor.transpose(self.forward(state, act_ids),0,1)
         if sample:
             act_probs = [F.softmax(vals, dim=0) for vals in q_values]
             act_idxs = [torch.multinomial(probs, num_samples=1).item() \
@@ -212,7 +212,7 @@ class DRRN_Agent:
         action_ids, action_idxs, _ = self.act(state, actions)
         # self.action_space[range(self.action_space.shape[0]), action_ind]
         action_val = [action[idx] for action, idx in zip(actions, action_idxs)]
-        print(_)
+        print(action_val)
         action = np.array(action_val.numpy(), dtype=np.intc)
         reward = env.step(action, num_steps=4)
         return (reward, action)
