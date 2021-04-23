@@ -185,7 +185,7 @@ class DRRN_Agent:
         self.batch_size = 64
         self.obs_dim = 3
         self.network = DRRN(self.obs_dim, embedding_dim=128, hidden_dim=128)
-        self.memory = ReplayMemory(memory_size=5000)
+        self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
         self.clip = 5
         self.optimizer = torch.optim.Adam(self.network.parameters(),
