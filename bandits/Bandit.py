@@ -68,7 +68,7 @@ class Bandit(abc.ABC, object):
         self.cumregrets_R = None
         self.rewards_expected_R = None
 
-    def play_arm(self, a, env, dqn_agent, context, prev_reward=None, prev_action=None, prev_state=None):
+    def play_arm(self, a, t, env, dqn_agent, context, prev_reward=None, prev_action=None, prev_state=None):
         """Play bandit's arm a with true reward function
 
         Args:
