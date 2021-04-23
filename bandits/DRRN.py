@@ -209,7 +209,7 @@ class DRRN_Agent:
     def execute_action(self, env, state, arm):
         actions = self.action_list(arm)
         action_val = self.act(state, actions)
-        action = np.array(action_val.numpy(), dtype=np.intc)
+        action = np.array(action_val, dtype=np.intc)
         reward = env.step(action, num_steps=4)
         return (reward, action)
 
