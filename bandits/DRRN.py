@@ -11,7 +11,7 @@ import itertools
 
 ######## Helper function ########
 def action_segments():
-    x = 511
+    x = 512
     y = 0
     coords = [[x, y]]
     theta = [(t * np.pi / 180) for t in range(5, 365, 5)]
@@ -20,9 +20,7 @@ def action_segments():
         new_y = np.floor(x * np.sin(t) + y * np.cos(t))
         coords.append((new_x, new_y))
     A = len(coords)
-    print(coords)
     return coords, A
-import numpy as np
 
 
 def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
@@ -187,7 +185,7 @@ class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
         self.batch_size = 64
-        self.action_dim = 1024
+        self.action_dim = 1025
         self.obs_dim = 256
         self.network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
