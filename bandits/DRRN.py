@@ -150,8 +150,7 @@ class DRRN(torch.nn.Module):
         # This is number of admissible commands in each element of the batch
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
-        act_batch = list(itertools.chain.from_iterable(act_batch))
-        print(act_batch.shape)
+        act_batch = act_batch.tolist()
         act_out = self.packed_rnn(act_batch, self.act_encoder)
         # Encode the various aspects of the state
         obs_out = self.packed_rnn(state, self.obs_encoder)
