@@ -148,16 +148,18 @@ class DRRN(torch.nn.Module):
         # Zip the state_batch into an easy access format
         # state = State(*zip(*state_batch))
         # This is number of admissible commands in each element of the batch
-        act_sizes = [len(a) for a in act_batch]
+        state_size = len(state)
+        print(state.shape)
+        # act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
         # act_out = self.packed_rnn(act_batch, self.act_encoder)
         # Encode the various aspects of the state
         obs_out = self.packed_rnn(state, self.obs_encoder)
         # look_out = self.packed_rnn(state.description, self.look_encoder)
         # inv_out = self.packed_rnn(state.inventory, self.inv_encoder)
-        state_out = torch.cat((obs_out, look_out, inv_out), dim=1)
+        # state_out = torch.cat((obs_out), dim=1)
         # Expand the state to match the batches of actions
-        state_out = torch.cat([state_out[i].repeat(j,1) for i,j in enumerate(act_sizes)], dim=0)
+        act_out = torch.cat([state_out[i].repeat(j,1) for i,j in enumerate(act_sizes)], dim=0)
         z = torch.cat((state_out, act_batch), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
         act_values = self.act_scorer(z).squeeze(-1)
