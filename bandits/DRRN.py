@@ -127,7 +127,7 @@ class DRRN(torch.nn.Module):
         if type_embed == 'action':
             embed = self.action_embedding(x_tt).permute(1,0,2) # Time x Batch x EncDim
         elif type_embed == 'state':
-            embed = self.state_embedding(x_tt).permute(1,0,2) # Time x Batch x EncDim
+            embed = self.state_embedding(x_tt).permute(1,0,2,3) # Time x Batch x EncDim
         else:
             raise ValueError('Unknown embedding type')
         # Pack padded batch of sequences for RNN module

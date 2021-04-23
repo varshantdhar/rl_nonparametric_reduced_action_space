@@ -115,7 +115,6 @@ class BanditSampling(Bandit):
         while env.is_running() and t < t_max:
             start_time = time.time()
             orig_state = env.observations()["RGB_INTERLEAVED"]
-            print(orig_state)
             context_ = orig_state.flatten()
             self.context[:,t] = context_
 
