@@ -131,6 +131,7 @@ class DRRN(torch.nn.Module):
         else:
             raise ValueError('Unknown embedding type')
         # Pack padded batch of sequences for RNN module
+        print(embed.shape, type_embed)
         packed = nn.utils.rnn.pack_padded_sequence(embed, lengths)
         # Run the RNN
         out, _ = rnn(packed)
