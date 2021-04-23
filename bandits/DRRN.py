@@ -161,12 +161,10 @@ class DRRN(torch.nn.Module):
         # Encode the various aspects of the state
         state_out = self.packed_rnn(state, self.state_encoder, 'state')
         # Expand the state to match the batches of actions
-        # n_state = torch.transpose(state_out, 0, 1)
-        # state_out = torch.cat([n_state[i].repeat(3) for i in range(act_out.shape[1])], dim=1)
         state_out = state_out.repeat(1, 3).view(-1, 128)
         z = torch.cat((state_out, act_out), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
-        act_values = self.act_scorer(z).squeeze(-1)
+        act_values = self.act_scorer(z)#.squeeze(-1)
         print(act_values.shape)
         # Split up the q-values by batch
         return act_values.split(act_sizes)
