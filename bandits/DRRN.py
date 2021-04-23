@@ -20,6 +20,7 @@ def action_segments():
         new_y = np.floor(x * np.sin(t) + y * np.cos(t))
         coords.append((new_x, new_y))
     A = len(coords)
+    print(coords)
     return coords, A
 import numpy as np
 
