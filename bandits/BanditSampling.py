@@ -62,7 +62,7 @@ class BanditSampling(Bandit):
         # targ_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=20)
         # Initialize agent
         # dqn_agent = agent.QLearning_Agent()
-        dqn_agent = agent.DRRN_Agent()
+        dqn_agent = DRRN.DRRN_Agent()
 
         for r in np.arange(R):
             # Run one realization
