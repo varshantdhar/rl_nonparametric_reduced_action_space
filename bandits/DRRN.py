@@ -101,7 +101,7 @@ class DRRN(torch.nn.Module):
         super(DRRN, self).__init__()
         self.action_embedding = nn.Embedding(action_dim, embedding_dim)
         self.state_embedding = nn.Embedding(obs_dim, embedding_dim)
-        self.obs_encoder  = nn.GRU(embedding_dim, hidden_dim)
+        self.state_encoder  = nn.GRU(embedding_dim, hidden_dim)
         # self.look_encoder = nn.GRU(embedding_dim, hidden_dim)
         # self.inv_encoder  = nn.GRU(embedding_dim, hidden_dim)
         self.act_encoder  = nn.GRU(embedding_dim, hidden_dim)
@@ -109,7 +109,7 @@ class DRRN(torch.nn.Module):
         self.act_scorer   = nn.Linear(hidden_dim, 1)
 
 
-    def packed_rnn(self, x, rnn):
+    def packed_rnn(self, x, rnn, type_embed):
         """ Runs the provided rnn on the input x. Takes care of packing/unpacking.
             x: list of unpadded input sequences
             Returns a tensor of size: len(x) x hidden_dim
@@ -124,7 +124,12 @@ class DRRN(torch.nn.Module):
         x_tt = torch.from_numpy(padded_x).type(torch.long)
         x_tt = x_tt.index_select(0, idx_sort)
         # Run the embedding layer
-        embed = self.embedding(x_tt).permute(1,0,2) # Time x Batch x EncDim
+        if type_embed == 'action':
+            embed = self.action_embedding(x_tt).permute(1,0,2) # Time x Batch x EncDim
+        elif type_embed == 'state':
+            embed = self.state_embedding(x_tt).permute(1,0,2) # Time x Batch x EncDim
+        else:
+            raise ValueError('Unknown embedding type')
         # Pack padded batch of sequences for RNN module
         packed = nn.utils.rnn.pack_padded_sequence(embed, lengths)
         # Run the RNN
@@ -152,9 +157,9 @@ class DRRN(torch.nn.Module):
         state_size = len(state)
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
-        act_out = self.packed_rnn([act + 512 for act in act_batch], self.act_encoder)
+        act_out = self.packed_rnn([act + 512 for act in act_batch], self.act_encoder, 'action')
         # Encode the various aspects of the state
-        obs_out = self.packed_rnn(state, self.obs_encoder)
+        state_out = self.packed_rnn(state, self.state_encoder, 'state')
         # look_out = self.packed_rnn(state.description, self.look_encoder)
         # inv_out = self.packed_rnn(state.inventory, self.inv_encoder)
         # state_out = torch.cat((obs_out), dim=1)
