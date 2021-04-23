@@ -60,12 +60,12 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
         x[idx, :len(trunc)] = trunc
     return x
 
-def train(agent, target_network, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
+def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
     if prev_state is None:
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
     else:
-        agent.train_network(target_network, prev_state, prev_action, prev_reward, state, arm, done = (not env.is_running()))
+        agent.train_network(prev_state, prev_action, prev_reward, state, arm, done = (not env.is_running()))
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
 
@@ -188,6 +188,7 @@ class DRRN_Agent:
         self.action_dim = 1025
         self.obs_dim = 256
         self.network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
+        self.target_network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
         self.clip = 5
@@ -212,10 +213,10 @@ class DRRN_Agent:
         reward = env.step(action, num_steps=4)
         return (reward, action)
 
-    def train_network(self, target_network, state, action, reward, next_state, next_actions, done):
+    def train_network(self, state, action, reward, next_state, next_actions, done):
         actions = self.action_list(next_actions)
         self.observe(state, action, reward, next_state, actions, done)
-        loss = self.update(target_network)
+        loss = self.update()
         if loss is not None:
             print("Obtained a loss!")
             # outfile = open('HLGM_DRRN_LOSS','ab+')
@@ -243,7 +244,7 @@ class DRRN_Agent:
 
         # Compute Q(s', a') for all a'
         # TODO: Use a target network???
-        _, next_qvals = target_network.act(batch.next_state, batch.next_acts)
+        _, next_qvals = self.target_network.act(batch.next_state, batch.next_acts)
         # Take the max over next q-values
         next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
         # Zero all the next_qvals that are done
@@ -253,7 +254,7 @@ class DRRN_Agent:
         # Next compute Q(s, a)
         # Nest each action in a list - so that it becomes the only admissible cmd
         nested_acts = tuple([[a] for a in batch.act])
-        qvals = self.network(batch.state, nested_acts)
+        _, qvals = self.target_network.act(batch.state, nested_acts)
         # Combine the qvals: Maybe just do a greedy max for generality
         qvals = torch.cat(qvals)
 

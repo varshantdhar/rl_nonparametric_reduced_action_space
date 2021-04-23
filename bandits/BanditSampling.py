@@ -63,7 +63,6 @@ class BanditSampling(Bandit):
         # Initialize agent
         # dqn_agent = agent.QLearning_Agent()
         dqn_agent = DRRN.DRRN_Agent()
-        target_network = DRRN(action_dim=1025, obs_dim=256, embedding_dim=128, hidden_dim=128)
 
         for r in np.arange(R):
             # Run one realization
@@ -73,7 +72,7 @@ class BanditSampling(Bandit):
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
 
-            self.execute(t_max, env, dqn_agent, target_network)
+            self.execute(t_max, env, dqn_agent)
 
             self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
             self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
@@ -83,7 +82,7 @@ class BanditSampling(Bandit):
             self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'], self.arm_predictive_density_R['var']=online_update_mean_var(r+1, self.arm_predictive_density['mean'], self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'])
             self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'], self.arm_N_samples_R['var']=online_update_mean_var(r+1, self.arm_N_samples, self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'])
 
-    def execute(self, t_max, env, dqn_agent, target_network):
+    def execute(self, t_max, env, dqn_agent):
         """Execute the Bayesian bandit
         Args:
             t_max: maximum execution time for the bandit
@@ -142,7 +141,7 @@ class BanditSampling(Bandit):
             if t == 0:
                 print("Running DQN to select action from action set")
             # self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
-            prev_reward, prev_action, prev_state = self.play_arm(action, t, env, dqn_agent, target_network, orig_state, prev_reward, prev_action, prev_state)
+            prev_reward, prev_action, prev_state = self.play_arm(action, t, env, dqn_agent, orig_state, prev_reward, prev_action, prev_state)
 
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
