@@ -163,7 +163,7 @@ class DRRN(torch.nn.Module):
         # Expand the state to match the batches of actions
         # n_state = torch.transpose(state_out, 0, 1)
         # state_out = torch.cat([n_state[i].repeat(3) for i in range(act_out.shape[1])], dim=1)
-        state_out = state_out.view(-1, 1).repeat(1, 3).view(3, 72)
+        state_out = state_out.repeat(1, 3).view(-1, 128)
         print(state_out.shape)
         z = torch.cat((state_out, act_out), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
