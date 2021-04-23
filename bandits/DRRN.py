@@ -164,18 +164,19 @@ class DRRN(torch.nn.Module):
         state_out = state_out.repeat(1, 3).view(-1, 128)
         z = torch.cat((state_out, act_out), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
-        act_values = self.act_scorer(z).squeeze(-1)
+        q_values = self.act_scorer(z).squeeze(-1)
         # Split up the q-values by batch
-        return act_values.split(len(act_sizes))
+        return q_values.split(len(act_sizes))
 
 
     def act(self, state, act_ids, sample=True):
         """ Returns an action-string, optionally sampling from the distribution
             of Q-Values.
         """
-        act_values = self.forward(state, act_ids)
+        q_values = self.forward(state, act_ids)
         if sample:
             act_probs = [F.softmax(vals, dim=0) for vals in act_values]
+            print(act_probs)
             act_idxs = [torch.multinomial(probs, num_samples=1).item() \
                         for probs in act_probs]
         else:
