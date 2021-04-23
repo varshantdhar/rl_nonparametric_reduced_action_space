@@ -120,6 +120,7 @@ class DRRN(torch.nn.Module):
         idx_sort = torch.autograd.Variable(idx_sort)
         idx_unsort = torch.autograd.Variable(idx_unsort)
         padded_x = pad_sequences(x)
+        print(padded_x.shape)
         x_tt = torch.from_numpy(padded_x).type(torch.long)
         x_tt = x_tt.index_select(0, idx_sort)
         # Run the embedding layer
@@ -183,7 +184,7 @@ class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
         self.batch_size = 64
-        self.obs_dim = 3
+        self.obs_dim = 240
         self.network = DRRN(self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
