@@ -101,7 +101,7 @@ class DRRN(torch.nn.Module):
         super(DRRN, self).__init__()
         self.action_embedding = nn.Embedding(action_dim, embedding_dim)
         self.state_embedding = nn.Embedding(obs_dim, embedding_dim)
-        self.state_encoder  = nn.GRU(64, 3, hidden_dim)
+        self.state_encoder  = nn.GRU(embedding_dim, hidden_dim, 3)
         # self.look_encoder = nn.GRU(embedding_dim, hidden_dim)
         # self.inv_encoder  = nn.GRU(embedding_dim, hidden_dim)
         self.act_encoder  = nn.GRU(embedding_dim, hidden_dim)
