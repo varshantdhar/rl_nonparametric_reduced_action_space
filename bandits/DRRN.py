@@ -149,16 +149,16 @@ class DRRN(torch.nn.Module):
         # state = State(*zip(*state_batch))
         # This is number of admissible commands in each element of the batch
         state_size = len(state)
-        print(state.shape)
-        # act_sizes = [len(a) for a in act_batch]
+        act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
-        # act_out = self.packed_rnn(act_batch, self.act_encoder)
+        act_out = self.packed_rnn(act_batch + 512, self.act_encoder)
         # Encode the various aspects of the state
-        obs_out = self.packed_rnn(state, self.obs_encoder)
+        # obs_out = self.packed_rnn(state, self.obs_encoder)
         # look_out = self.packed_rnn(state.description, self.look_encoder)
         # inv_out = self.packed_rnn(state.inventory, self.inv_encoder)
         # state_out = torch.cat((obs_out), dim=1)
         # Expand the state to match the batches of actions
+        print("Made it here")
         act_out = torch.cat([state_out[i].repeat(j,1) for i,j in enumerate(act_sizes)], dim=0)
         z = torch.cat((state_out, act_batch), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
@@ -184,7 +184,7 @@ class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
         self.batch_size = 64
-        self.obs_dim = 8
+        self.obs_dim = 1024
         self.network = DRRN(self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
