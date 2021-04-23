@@ -179,8 +179,8 @@ class DRRN(torch.nn.Module):
             act_idxs = [torch.multinomial(probs, num_samples=1).item() \
                         for probs in act_probs[0]]
         else:
-            act_idxs = [vals.argmax(dim=0).item() for vals in act_values]
-        return act_idxs, act_values
+            act_idxs = [vals.argmax(dim=0).item() for vals in q_values]
+        return act_idxs, q_values
 
 class DRRN_Agent:
     def __init__(self):
