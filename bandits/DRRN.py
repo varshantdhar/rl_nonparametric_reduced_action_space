@@ -153,7 +153,7 @@ class DRRN(torch.nn.Module):
         # Combine next actions into one long list
         act_out = self.packed_rnn([act + 512 for act in act_batch], self.act_encoder)
         # Encode the various aspects of the state
-        # obs_out = self.packed_rnn(state, self.obs_encoder)
+        obs_out = self.packed_rnn(state, self.obs_encoder)
         # look_out = self.packed_rnn(state.description, self.look_encoder)
         # inv_out = self.packed_rnn(state.inventory, self.inv_encoder)
         # state_out = torch.cat((obs_out), dim=1)
