@@ -235,7 +235,7 @@ class DRRN_Agent:
         return act_val
 
 
-    def update(self, target_network):
+    def update(self):
         if len(self.memory) < self.batch_size:
             return
 
