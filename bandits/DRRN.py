@@ -166,7 +166,7 @@ class DRRN(torch.nn.Module):
         z = F.relu(self.hidden(z))
         q_values = self.act_scorer(z).squeeze(-1)
         # Split up the q-values by batch
-        return q_values.split(len(act_sizes))
+        return q_values
 
 
     def act(self, state, act_ids, sample=True):
@@ -177,7 +177,7 @@ class DRRN(torch.nn.Module):
         if sample:
             act_probs = [F.softmax(vals, dim=0) for vals in q_values]
             act_idxs = [torch.multinomial(probs, num_samples=1).item() \
-                        for probs in act_probs[0]]
+                        for probs in act_probs]
         else:
             act_idxs = [vals.argmax(dim=0).item() for vals in q_values]
         return act_idxs, q_values
@@ -218,7 +218,7 @@ class DRRN_Agent:
 
     def train_network(self, context, action, reward, next_state, next_actions, done):
         actions = self.action_list(arm)
-        self.observe(state, act, rew, next_state, valids, done)
+        self.observe(state, act, rew, next_state, actions, done)
         loss = self.update()
         if loss is not None:
             print("Obtained a loss!")
@@ -234,7 +234,6 @@ class DRRN_Agent:
     def act(self, state, poss_acts, sample=True):
         """ Returns a string action from poss_acts. """
         idxs, values = self.network.act(state, poss_acts, sample)
-        print(idxs, values)
         act_ids = [poss_acts[batch][idx] for batch, idx in enumerate(idxs)]
         return act_ids, idxs, values
 
