@@ -156,7 +156,7 @@ class DRRN(torch.nn.Module):
         state_size = len(state)
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
-        act_out = self.packed_rnn([act + 512 for act in act_batch], self.act_encoder, 'action')
+        act_out = self.packed_rnn([np.array(act) + 512 for act in act_batch], self.act_encoder, 'action')
         # Encode the various aspects of the state
         state_out = self.packed_rnn(state, self.state_encoder, 'state')
         # Expand the state to match the batches of actions
