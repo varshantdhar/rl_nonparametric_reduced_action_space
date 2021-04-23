@@ -60,7 +60,7 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
         x[idx, :len(trunc)] = trunc
     return x
 
-def train(agent, target_network, state, env, arm, target_network, prev_reward=None, prev_action=None, prev_state=None):
+def train(agent, target_network, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
     if prev_state is None:
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
