@@ -97,9 +97,10 @@ class DRRN(torch.nn.Module):
     """
         Deep Reinforcement Relevance Network - He et al. '16
     """
-    def __init__(self, obs_dim, embedding_dim, hidden_dim):
+    def __init__(self, action_dim, obs_dim, embedding_dim, hidden_dim):
         super(DRRN, self).__init__()
-        self.embedding    = nn.Embedding(obs_dim, embedding_dim)
+        self.action_embedding = nn.Embedding(action_dim, embedding_dim)
+        self.state_embedding = nn.Embedding(obs_dim, embedding_dim)
         self.obs_encoder  = nn.GRU(embedding_dim, hidden_dim)
         # self.look_encoder = nn.GRU(embedding_dim, hidden_dim)
         # self.inv_encoder  = nn.GRU(embedding_dim, hidden_dim)
@@ -184,7 +185,8 @@ class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
         self.batch_size = 64
-        self.obs_dim = 1024
+        self.action_dim = 1024
+        # self.obs_dim = 
         self.network = DRRN(self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
