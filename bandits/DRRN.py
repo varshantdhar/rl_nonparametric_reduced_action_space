@@ -120,7 +120,6 @@ class DRRN(torch.nn.Module):
         idx_sort = torch.autograd.Variable(idx_sort)
         idx_unsort = torch.autograd.Variable(idx_unsort)
         padded_x = pad_sequences(x)
-        print(padded_x.shape)
         x_tt = torch.from_numpy(padded_x).type(torch.long)
         x_tt = x_tt.index_select(0, idx_sort)
         # Run the embedding layer
@@ -151,7 +150,7 @@ class DRRN(torch.nn.Module):
         # This is number of admissible commands in each element of the batch
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
-        act_out = self.packed_rnn(act_batch, self.act_encoder)
+        # act_out = self.packed_rnn(act_batch, self.act_encoder)
         # Encode the various aspects of the state
         obs_out = self.packed_rnn(state, self.obs_encoder)
         # look_out = self.packed_rnn(state.description, self.look_encoder)
@@ -159,7 +158,7 @@ class DRRN(torch.nn.Module):
         state_out = torch.cat((obs_out, look_out, inv_out), dim=1)
         # Expand the state to match the batches of actions
         state_out = torch.cat([state_out[i].repeat(j,1) for i,j in enumerate(act_sizes)], dim=0)
-        z = torch.cat((state_out, act_out), dim=1) # Concat along hidden_dim
+        z = torch.cat((state_out, act_batch), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
         act_values = self.act_scorer(z).squeeze(-1)
         # Split up the q-values by batch
