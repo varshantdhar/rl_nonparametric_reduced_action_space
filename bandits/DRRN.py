@@ -166,7 +166,7 @@ class DRRN(torch.nn.Module):
         z = F.relu(self.hidden(z))
         act_values = self.act_scorer(z).squeeze(-1)
         # Split up the q-values by batch
-        return act_values #.split(act_sizes)
+        return act_values.split(len(act_sizes))
 
 
     def act(self, state, act_ids, sample=True):
