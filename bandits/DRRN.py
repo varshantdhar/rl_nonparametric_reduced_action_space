@@ -180,7 +180,7 @@ class DRRN(torch.nn.Module):
         return act_idxs, act_values
 
 class DRRN_Agent:
-    def __init__(self, args):
+    def __init__(self):
         self.gamma = 0.9
         self.batch_size = 64
         self.obs_dim = 3
