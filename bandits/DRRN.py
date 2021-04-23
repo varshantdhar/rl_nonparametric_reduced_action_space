@@ -113,7 +113,7 @@ class DRRN(torch.nn.Module):
             x: list of unpadded input sequences
             Returns a tensor of size: len(x) x hidden_dim
         """
-        lengths = torch.tensor([len(n) for n in x], dtype=torch.long, device=device)
+        lengths = torch.tensor([len(n) for n in x], dtype=torch.long, device="cpu")
         # Sort this batch in descending order by seq length
         lengths, idx_sort = torch.sort(lengths, dim=0, descending=True)
         _, idx_unsort = torch.sort(idx_sort, dim=0)
@@ -245,10 +245,10 @@ class DRRN_Agent:
         # TODO: Use a target network???
         next_qvals = self.network(batch.next_state, batch.next_acts)
         # Take the max over next q-values
-        next_qvals = torch.tensor([vals.max() for vals in next_qvals], device=device)
+        next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
         # Zero all the next_qvals that are done
-        next_qvals = next_qvals * (1-torch.tensor(batch.done, dtype=torch.float, device=device))
-        targets = torch.tensor(batch.reward, dtype=torch.float, device=device) + self.gamma * next_qvals
+        next_qvals = next_qvals * (1-torch.tensor(batch.done, dtype=torch.float, device="cpu"))
+        targets = torch.tensor(batch.reward, dtype=torch.float, device="cpu") + self.gamma * next_qvals
 
         # Next compute Q(s, a)
         # Nest each action in a list - so that it becomes the only admissible cmd
