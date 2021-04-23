@@ -186,7 +186,7 @@ class DRRN_Agent:
         self.gamma = 0.9
         self.batch_size = 64
         self.action_dim = 1024
-        # self.obs_dim = 
+        self.obs_dim = 256
         self.network = DRRN(self.obs_dim, embedding_dim=128, hidden_dim=128)
         self.memory = ReplayMemory(capacity=5000)
         self.save_path = 'logs'
