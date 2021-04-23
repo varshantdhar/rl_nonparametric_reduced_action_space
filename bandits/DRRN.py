@@ -176,9 +176,8 @@ class DRRN(torch.nn.Module):
         q_values = self.forward(state, act_ids)
         if sample:
             act_probs = [F.softmax(vals, dim=0) for vals in q_values]
-            print(len(act_probs[0]),len(act_probs[0][0]))
             act_idxs = [torch.multinomial(probs, num_samples=1).item() \
-                        for probs in act_probs]
+                        for probs in act_probs[0]]
         else:
             act_idxs = [vals.argmax(dim=0).item() for vals in act_values]
         return act_idxs, act_values
