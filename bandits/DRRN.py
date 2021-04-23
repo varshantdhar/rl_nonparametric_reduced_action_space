@@ -60,12 +60,12 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
         x[idx, :len(trunc)] = trunc
     return x
 
-def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
+def train(agent, target_network, state, env, arm, target_network, prev_reward=None, prev_action=None, prev_state=None):
     if prev_state is None:
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
     else:
-        agent.train_network(prev_state, prev_action, prev_reward, state, arm, done = (not env.is_running()))
+        agent.train_network(target_network, prev_state, prev_action, prev_reward, state, arm, done = (not env.is_running()))
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
 
@@ -212,10 +212,10 @@ class DRRN_Agent:
         reward = env.step(action, num_steps=4)
         return (reward, action)
 
-    def train_network(self, state, action, reward, next_state, next_actions, done):
+    def train_network(self, target_network, state, action, reward, next_state, next_actions, done):
         actions = self.action_list(next_actions)
         self.observe(state, action, reward, next_state, actions, done)
-        loss = self.update()
+        loss = self.update(target_network)
         if loss is not None:
             print("Obtained a loss!")
             # outfile = open('HLGM_DRRN_LOSS','ab+')
@@ -234,7 +234,7 @@ class DRRN_Agent:
         return act_val
 
 
-    def update(self):
+    def update(self, target_network):
         if len(self.memory) < self.batch_size:
             return
 
@@ -243,7 +243,7 @@ class DRRN_Agent:
 
         # Compute Q(s', a') for all a'
         # TODO: Use a target network???
-        next_qvals = self.network(batch.next_state, batch.next_acts)
+        _, next_qvals = target_network.act(batch.next_state, batch.next_acts)
         # Take the max over next q-values
         next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
         # Zero all the next_qvals that are done
