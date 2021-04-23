@@ -62,11 +62,11 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
     return x
 
 def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
-    if prev_reward == None:
+    if prev_state == None:
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
     else:
-        agent.train_network(prev_state, prev_action, prev_reward, state, arm, done = env.is_running())
+        agent.train_network(prev_state, prev_action, prev_reward, state, arm, done = (not env.is_running()))
         rew, prev_action = agent.execute_action(env, state, arm)
         return (rew, prev_action, state)
 
@@ -208,11 +208,7 @@ class DRRN_Agent:
 
     def execute_action(self, env, state, arm):
         actions = self.action_list(arm)
-        # actions = torch.transpose(torch.Tensor(self.action_list(arm)),0,1)
-        action_ids, action_idxs, _ = self.act(state, actions)
-        # self.action_space[range(self.action_space.shape[0]), action_ind]
-        # action_val = [action[idx] for action, idx in zip(actions, action_idxs)]
-        print(action_ids)
+        action_val = self.act(state, actions)
         action = np.array(action_val.numpy(), dtype=np.intc)
         reward = env.step(action, num_steps=4)
         return (reward, action)
@@ -235,8 +231,8 @@ class DRRN_Agent:
     def act(self, state, poss_acts, sample=True):
         """ Returns a string action from poss_acts. """
         idxs, values = self.network.act(state, poss_acts, sample)
-        act_ids = [poss_acts[idx][val] for val, idx in enumerate(idxs)]
-        return act_ids, idxs, values
+        act_val = [poss_acts[idx][val] for val, idx in enumerate(idxs)]
+        return act_val
 
 
     def update(self):
