@@ -212,6 +212,7 @@ class DRRN_Agent:
         action_ids, action_idxs, _ = self.act(state, actions)
         # self.action_space[range(self.action_space.shape[0]), action_ind]
         action_val = [action[idx] for action, idx in zip(actions, action_idxs)]
+        print(action_val)
         action = np.array(action_val.numpy(), dtype=np.intc)
         reward = env.step(action, num_steps=4)
         return (reward, action)
