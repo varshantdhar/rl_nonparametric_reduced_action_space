@@ -240,11 +240,13 @@ class DRRN_Agent:
             return
 
         transitions = self.memory.sample(self.batch_size)
-        batch = Transition(*zip(*transitions))
+        batches = Transition(*zip(*transitions))
+        for batch in batches:
+            print(batch)
+            break
 
         # Compute Q(s', a') for all a'
         # TODO: Use a target network???
-        print(batch)
         _, next_qvals = self.target_network.act(batch.next_state, batch.next_acts)
         # Take the max over next q-values
         next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
