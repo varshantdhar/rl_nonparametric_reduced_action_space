@@ -240,19 +240,21 @@ class DRRN_Agent:
             return
 
         transitions = self.memory.sample(self.batch_size)
-        batches = Transition(*zip(*transitions))
-        for batch in batches:
-            print(batch)
-            break
+        batch = Transition(*zip(*transitions))
 
         # Compute Q(s', a') for all a'
-        # TODO: Use a target network???
-        _, next_qvals = self.target_network.act(batch.next_state, batch.next_acts)
+        next_qvals = []
+        for next_state, next_act in zip(batch.next_state, batch.next_acts):
+            _, next_qval = self.target_network.act(next_state, next_acts)
+            next_qvals.append(next_qval)
         # Take the max over next q-values
         next_qvals = torch.tensor([vals.max() for vals in next_qvals], device="cpu")
         # Zero all the next_qvals that are done
         next_qvals = next_qvals * (1-torch.tensor(batch.done, dtype=torch.float, device="cpu"))
         targets = torch.tensor(batch.reward, dtype=torch.float, device="cpu") + self.gamma * next_qvals
+
+        
+        # TODO: Use a target network???
 
         # Next compute Q(s, a)
         # Nest each action in a list - so that it becomes the only admissible cmd
