@@ -2,7 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-import agent
+import DRRN
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     path = os.path.dirname(inspect.getfile(deepmind_lab))
     deepmind_lab.set_runfiles_path(path)
 
-    coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
+    coords, A = DRRN.action_segments()  # Rotation Axes, Number of Arms
     print(A)
     rewards = 0
     R = 300 # Number of realizations to run
