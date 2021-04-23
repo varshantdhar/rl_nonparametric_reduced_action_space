@@ -151,6 +151,7 @@ class DRRN(torch.nn.Module):
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
         act_batch = list(itertools.chain.from_iterable(act_batch))
+        print(act_batch.shape)
         act_out = self.packed_rnn(act_batch, self.act_encoder)
         # Encode the various aspects of the state
         obs_out = self.packed_rnn(state, self.obs_encoder)
