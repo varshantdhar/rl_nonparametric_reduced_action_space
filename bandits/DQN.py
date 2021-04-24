@@ -86,9 +86,9 @@ def train(n_epoch, env, agent):
                 frame_count += 1
 
         running_rewards.append(episode_reward)
-        time = time.process_time() - start_time
-        print(i, time, episode_reward)
-        train_dict = {'iteration':i, 'time': time, 'reward': episode_reward}
+        time_taken = time.process_time() - start_time
+        print(i, time_taken, episode_reward)
+        train_dict = {'iteration':i, 'time': time_taken, 'reward': episode_reward}
         outfile = open('dqn_performance','ab+')
         pickle.dump(train_dict,outfile)
         outfile.close()
