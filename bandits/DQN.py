@@ -69,6 +69,8 @@ def train(n_epoch, env, agent):
             values, action_ind = agent.get_action(state)
             action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
             reward = env.step(action,num_steps=4)
+            if reward == 0.0: reward += 1
+            else: reward *= 100
             episode_reward += reward
             done = not env.is_running()
             if done:
