@@ -166,7 +166,7 @@ class BanditSampling(Bandit):
         time_taken = time.time() - start_time
         print("Cumulative Regrets for Episode: {} Time Taken: {}".format(self.cumregrets[-1], time_taken))
         dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time_taken}
-        outfile = open('HLGM_performance_coarse_cumrewards','ab+')
+        outfile = open('DRRN_performance','ab+')
         pickle.dump(dict_store,outfile)
         outfile.close()
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
