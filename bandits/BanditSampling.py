@@ -143,14 +143,14 @@ class BanditSampling(Bandit):
             # self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
             prev_reward, prev_action, prev_state = self.play_arm(action, t, env, dqn_agent, orig_state, prev_reward, prev_action, prev_state)
 
-            if np.isnan(self.rewards[action, t]):
+            if np.isnan(prev_reward):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
                 episode_rewards += prev_reward
                 self.rewards[action, t] = episode_rewards
-                if self.rewards[action, t] != 0:
+                if prev_reward != 1:
                     print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
             t += 1
@@ -163,11 +163,12 @@ class BanditSampling(Bandit):
         # Compute regret
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
-        print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
-        #dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
-        #outfile = open('HLGM_performance_coarse_cumrewards','ab+')
-        #pickle.dump(dict_store,outfile)
-        #outfile.close()
+        time_taken = time.time() - start_time
+        print("Cumulative Regrets for Episode: {} Time Taken: {}".format(self.cumregrets[-1], time_taken))
+        dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time_taken}
+        outfile = open('HLGM_performance_coarse_cumrewards','ab+')
+        pickle.dump(dict_store,outfile)
+        outfile.close()
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
