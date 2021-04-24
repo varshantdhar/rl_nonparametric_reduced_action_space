@@ -10,14 +10,13 @@ device = "cpu"
 
 def ql(env, agent, context, frame_count, running_rewards):
     # for i in range(n_epoch):
-    start_time = time.process_time()
     done = False
     state = agent.init_state(torch.Tensor(context))
     agent.epsilon *= 0.99
     # while not done:
     values, action_ind = agent.get_action(state)
     action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
-    reward = env.step(action, num_steps=1)
+    reward = (env.step(action, num_steps=4) * 100)
     if not env.is_running():
         running_rewards = 0
         done = True
@@ -29,8 +28,8 @@ def ql(env, agent, context, frame_count, running_rewards):
         
     agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
     agent.train_step(frame_count)
-    if reward > 0:
-        running_rewards += reward
+    running_rewards += reward
+    if reward != 0:
         print('Score (cumulative rewards): {} '.format(running_rewards))
     return (reward, running_rewards)
 

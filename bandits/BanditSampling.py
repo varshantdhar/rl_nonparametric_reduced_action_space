@@ -3,8 +3,10 @@
 # Imports: python modules
 # Imports: other modules
 from Bandit import *
-import DQN
-import agent
+
+import DRRN
+import time
+import pickle 
 
 class BanditSampling(Bandit):
     """Abstract class for bandits with sampling policies
@@ -56,10 +58,11 @@ class BanditSampling(Bandit):
         # Initialize target and value networks for Deep Q-Learning
         action_dim = 7
         num_actions = 72
-        val_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=10)
-        targ_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=10)
+        # val_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=20)
+        # targ_model = DQN.Q_NN_multidim(d_context, action_dim, num_actions, num_hidden=20)
         # Initialize agent
-        dqn_agent = agent.QLearning_Agent()
+        # dqn_agent = agent.QLearning_Agent()
+        dqn_agent = DRRN.DRRN_Agent()
 
         for r in np.arange(R):
             # Run one realization
@@ -69,7 +72,7 @@ class BanditSampling(Bandit):
             self.d_context = d_context
             self.context = np.zeros((d_context, t_max))
 
-            self.execute(t_max, env, val_model, targ_model, dqn_agent)
+            self.execute(t_max, env, dqn_agent)
 
             self.rewards_R['mean'], self.rewards_R['m2'], self.rewards_R['var']=online_update_mean_var(r+1, self.rewards.sum(axis=0), self.rewards_R['mean'], self.rewards_R['m2'])
             self.regrets_R['mean'], self.regrets_R['m2'], self.regrets_R['var']=online_update_mean_var(r+1, self.regrets, self.regrets_R['mean'], self.regrets_R['m2'])
@@ -79,7 +82,7 @@ class BanditSampling(Bandit):
             self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'], self.arm_predictive_density_R['var']=online_update_mean_var(r+1, self.arm_predictive_density['mean'], self.arm_predictive_density_R['mean'], self.arm_predictive_density_R['m2'])
             self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'], self.arm_N_samples_R['var']=online_update_mean_var(r+1, self.arm_N_samples, self.arm_N_samples_R['mean'], self.arm_N_samples_R['m2'])
 
-    def execute(self, t_max, env, val_model, targ_model, dqn_agent):
+    def execute(self, t_max, env, dqn_agent):
         """Execute the Bayesian bandit
         Args:
             t_max: maximum execution time for the bandit
@@ -103,9 +106,16 @@ class BanditSampling(Bandit):
         print("Running bandit to select action set")
         env.reset()
         t = 0
+        start_time = time.time()
+        prev_reward = None
+        prev_action = None
+        prev_state = None
+        episode_rewards = 0
 
         while env.is_running() and t < t_max:
-            context_ = env.observations()["RGB_INTERLEAVED"].flatten()
+            start_time = time.time()
+            orig_state = env.observations()["RGB_INTERLEAVED"].transpose(2,0,1).reshape(-1,8)
+            context_ = orig_state.flatten()
             self.context[:,t] = context_
 
             # Compute predictive density for each arm
@@ -130,20 +140,22 @@ class BanditSampling(Bandit):
             # Play selected arm
             if t == 0:
                 print("Running DQN to select action from action set")
-            self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
+            # self.play_arm(action, t, env, dqn_agent, self.context, val_model, targ_model)
+            prev_reward, prev_action, prev_state = self.play_arm(action, t, env, dqn_agent, orig_state, prev_reward, prev_action, prev_state)
 
             if np.isnan(self.rewards[action, t]):
                 # This instance has not been played, and no parameter update (e.g. for logged data)
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
-                if self.rewards[action, t] > 0:
-                    print('Reward obtained {} for iteration {}'.format(self.rewards[action, t], t))
+                episode_rewards += self.rewards[action, t]
+                if self.rewards[action, t] != 0:
+                    print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
             t += 1
 
-        print("Finished running bandit")
-        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
+        print("Finished running bandit at iteration {}". format(t))
+        
 
         # Compute expected rewards with true function
         self.compute_true_expected_rewards()
@@ -151,6 +163,11 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
+        dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
+        outfile = open('HLGM_performance_coarse','ab+')
+        pickle.dump(dict_store,outfile)
+        outfile.close()
+        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):

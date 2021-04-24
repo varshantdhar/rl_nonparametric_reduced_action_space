@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import agent
+import DRRN
 
 # Imports: python modules
 import abc
@@ -68,14 +68,17 @@ class Bandit(abc.ABC, object):
         self.cumregrets_R = None
         self.rewards_expected_R = None
 
-    def play_arm(self, a, t, env, dqn_agent, context, val_model, targ_model):
+    def play_arm(self, a, t, env, dqn_agent, context, prev_reward=None, prev_action=None, prev_state=None):
         """Play bandit's arm a with true reward function
 
         Args:
             a: arm to play
             t: time index (or set of indexes)
         """
-        self.rewards[a, t] = dqn_agent.step(a, t, context, env, val_model, targ_model)
+        # self.rewards[a, t] = dqn_agent.step(a, t, context, env, val_model, targ_model)
+        rew, prev_action, prev_state = DRRN.train(dqn_agent, context, env, a, prev_reward, prev_action, prev_state)
+        self.rewards[a, t] = rew
+        return (rew, prev_action, prev_state)
 
     def compute_true_expected_rewards(self):
         """Compute the expected rewards of the bandit for the true reward function

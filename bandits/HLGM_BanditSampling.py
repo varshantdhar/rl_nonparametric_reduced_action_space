@@ -2,7 +2,7 @@
 
 # Imports
 from MCMCBanditSampling import *
-import agent
+import DRRN
 from itertools import *
 from matplotlib import colors
 from pprintpp import pprint
@@ -28,11 +28,11 @@ def get_bandit(A, K, pi, theta, sigma, prior_K, d_context):
 	gibbs_loglik_eps=0.01
 
 	########## Priors
-	gamma=0.1
+	gamma=0.3
 	alpha=1.
 	beta=1.
 	sigma=1.
-	pitman_yor_d=0
+	pitman_yor_d=0.1
 	assert (0<=pitman_yor_d) and (pitman_yor_d<1) and (gamma >-pitman_yor_d)
 
 	thompsonSampling={'arm_N_samples':1}
@@ -65,16 +65,16 @@ if __name__ == "__main__":
     path = os.path.dirname(inspect.getfile(deepmind_lab))
     deepmind_lab.set_runfiles_path(path)
 
-    coords, A = agent.action_segments()  # Rotation Axes, Number of Arms
+    coords, A = DRRN.action_segments()  # Rotation Axes, Number of Arms
     rewards = 0
     R = 100 # Number of realizations to run
-    t_max = 1000 # Time-instants to run the bandit
+    t_max = 300 # Time-instants to run the bandit
     width = 8
     height = 8
     d_context = width * height * 3 # Context dimension
 
-    K = 2 # Number of mixtures per arm of the bandit
-    prior_K = 2  # Assumed prior number of mixtures (per arm)
+    K = 5 # Number of mixtures per arm of the bandit
+    prior_K = 5  # Assumed prior number of mixtures (per arm)
     pi = np.random.rand(A, K)  
     pi = pi / pi.sum(axis=1, keepdims=True) # Mixture proportions per arm
     theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     env = deepmind_lab.Lab(
         "seekavoid_arena_01",
         ["RGB_INTERLEAVED"],
-        config={"fps": "60", "width":"8", "height":"8"}
+        config={"fps": "60", "width": str(width), "height": str(height)}
     )
     env.reset()
 

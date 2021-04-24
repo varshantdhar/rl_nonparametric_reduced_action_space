@@ -8,6 +8,7 @@ import scipy.stats as stats
 import time
 import matplotlib.pyplot as plt
 import pdb
+import pickle
 
 ######## Class definition ########
 class MCMCPosterior(object):
@@ -118,7 +119,12 @@ class MCMCPosterior(object):
             # Ready to start Gibbs
             n_iter=1
             (XcondZ_loglik[n_iter], Z_loglik[n_iter])=self.compute_loglikelihood(a, z_a, N_ak, x_a, y_a)
-            
+
+            outfile = open('HLGM_loglik_coarse','ab+')
+            loglike_store = {'t': t, 'n_iter': n_iter, 'no_observations': t_a.sum(), 'arm': a, 'loglikelihood': XcondZ_loglik[n_iter]+Z_loglik[n_iter]}
+            pickle.dump(loglike_store,outfile)
+            outfile.close()
+
             # print('t={}, n_iter={}, {} observations for arm {} with loglikelihood={}'.format(t, n_iter, t_a.sum(), a, XcondZ_loglik[n_iter]+Z_loglik[n_iter]))
         
             # Iterate while not converged or not max iterations
@@ -193,28 +199,33 @@ class MCMCPosterior(object):
     
         # Parameters for linear Gaussian Mixture with Normal Inverse Gamma conjugate prior
         if how == 'add':
-            # Update alpha
-            self.reward_posterior['alpha'][a,k]+=1/2
-            # Update beta
-            self.reward_posterior['beta'][a,k]+=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
             # Sigma inverse
             sigma_inv=np.linalg.inv(self.reward_posterior['Sigma'][a,k])
             # Update regressor covariance (V)
             self.reward_posterior['Sigma'][a,k]=np.linalg.inv(sigma_inv+x[:,None]*x[None,:])
             # Update regressors (u)
             self.reward_posterior['theta'][a,k]=np.einsum('ab,b->a', self.reward_posterior['Sigma'][a,k],(x*y+np.einsum('ab,b->a',sigma_inv, self.reward_posterior['theta'][a,k])))
+            # Update alpha
+            self.reward_posterior['alpha'][a,k]+=1/2
+            # Update beta
+            self.reward_posterior['beta'][a,k]+=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
         
         elif how == 'del':
+            # Update alpha
+            self.reward_posterior['alpha'][a,k]-=1/2
+            # prior = self.reward_posterior['beta'][a,k]
+            # Update beta
+            self.reward_posterior['beta'][a,k]-=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
+            # post = self.reward_posterior['beta'][a,k]
             # Sigma inverse
             sigma_inv=np.linalg.inv(self.reward_posterior['Sigma'][a,k])
             # Update regressor covariance (V)
             self.reward_posterior['Sigma'][a,k]=np.linalg.inv(sigma_inv-x[:,None]*x[None,:])
             # Update regressors (u)
             self.reward_posterior['theta'][a,k]=np.einsum('ab,b->a', self.reward_posterior['Sigma'][a,k],(np.einsum('ab,b->a',sigma_inv, self.reward_posterior['theta'][a,k])-x*y))
-            # Update alpha
-            self.reward_posterior['alpha'][a,k]-=1/2
-            # Update beta
-            self.reward_posterior['beta'][a,k]-=np.power(y-np.einsum('d,d->', x, self.reward_posterior['theta'][a,k]),2)/(2*(1+np.einsum('d,da,a->',x,self.reward_posterior['Sigma'][a,k],x)))
+            # if post <= 0:
+            # print('Old Beta: {}, New Beta: {}, Sigma_Inv: {}, Sigma: {}, Theta: {}, x1: {}, x2: {}, y: {}'.format(prior, post, sigma_inv, self.reward_posterior['Sigma'][a], self.reward_posterior['theta'][a,k], x[:,None], x[None,:], y))
+            # print('Theta: {}'.format(self.reward_posterior['theta'][a,k]))
         else:
             raise ValueError('Unknown posterior parameter update type={}'.format(how))
         
