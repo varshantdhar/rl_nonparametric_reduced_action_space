@@ -258,7 +258,7 @@ class DRRN_Agent:
 
         # Next compute Q(s, a)
         # Nest each action in a list - so that it becomes the only admissible cmd
-        nested_acts = tuple([[a] for a in batch.act])
+        nested_acts = [a for a in batch.act]
         _, qvals = self.target_network.act(batch.state, nested_acts)
         # Combine the qvals: Maybe just do a greedy max for generality
         qvals = torch.cat(qvals)
