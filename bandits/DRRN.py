@@ -218,10 +218,10 @@ class DRRN_Agent:
         self.observe(state, action, reward, next_state, actions, done)
         loss = self.update()
         if loss is not None:
-            print("Obtained a loss!")
-            # outfile = open('HLGM_DRRN_LOSS','ab+')
-            # pickle.dump({'Loss': loss},outfile)
-            # outfile.close()
+            print('Loss: {}'.format(loss))
+            outfile = open('HLGM_DRRN_LOSS','ab+')
+            pickle.dump({'Loss': loss},outfile)
+            outfile.close()
 
 
     def observe(self, state, act, rew, next_state, next_acts, done):
@@ -238,7 +238,6 @@ class DRRN_Agent:
     def update(self):
         if len(self.memory) < self.batch_size:
             return
-        print("Calculating Loss")
 
         transitions = self.memory.sample(self.batch_size)
         batch = Transition(*zip(*transitions))

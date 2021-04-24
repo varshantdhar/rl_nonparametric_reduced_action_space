@@ -163,11 +163,11 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
-        # dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
-        # outfile = open('HLGM_performance_coarse','ab+')
-        # pickle.dump(dict_store,outfile)
-        # outfile.close()
-        # dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
+        dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
+        outfile = open('HLGM_performance_coarse','ab+')
+        pickle.dump(dict_store,outfile)
+        outfile.close()
+        dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
     def compute_arm_predictive_density(self, t):
