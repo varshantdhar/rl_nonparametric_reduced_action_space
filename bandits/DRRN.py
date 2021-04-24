@@ -238,6 +238,7 @@ class DRRN_Agent:
     def update(self):
         if len(self.memory) < self.batch_size:
             return
+        print("")
 
         transitions = self.memory.sample(self.batch_size)
         batch = Transition(*zip(*transitions))
@@ -259,7 +260,10 @@ class DRRN_Agent:
         # Next compute Q(s, a)
         # Nest each action in a list - so that it becomes the only admissible cmd
         nested_acts = [a for a in batch.act]
-        _, qvals = self.target_network.act(batch.state, nested_acts)
+        qvals = []
+        for state in batch.state:
+            _, qval = self.target_network.act(state, nested_acts)
+            qvals.append(qval)
         # Combine the qvals: Maybe just do a greedy max for generality
         qvals = torch.cat(qvals)
 
