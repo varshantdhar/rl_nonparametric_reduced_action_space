@@ -7,31 +7,80 @@ import matplotlib.pyplot as plt
 import time
 device = "cpu"
 
+######## Helper function ########
+def action_segments():
+    x = 512
+    y = 0
+    coords = [[x, y]]
+    theta = [(t * np.pi / 180) for t in range(5, 365, 5)]
+    for t in theta:
+        new_x = np.floor(x * np.cos(t) - y * np.sin(t))
+        new_y = np.floor(x * np.sin(t) + y * np.cos(t))
+        coords.append((new_x, new_y))
+    A = len(coords)
+    return coords, A
 
-def ql(env, agent, context, frame_count, running_rewards):
-    # for i in range(n_epoch):
-    done = False
-    state = agent.init_state(torch.Tensor(context))
-    agent.epsilon *= 0.99
-    # while not done:
-    values, action_ind = agent.get_action(state)
-    action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
-    reward = (env.step(action, num_steps=4) * 100)
-    if not env.is_running():
-        running_rewards = 0
-        done = True
-        agent.replay_buffer.add_sample(state, action_ind, reward, state, done)
-        agent.train_step(frame_count)
-        return (reward, running_rewards)
-    next_context = env.observations()["RGB_INTERLEAVED"].flatten()
-    next_state = agent.get_state(torch.Tensor(next_context))
-        
-    agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
-    agent.train_step(frame_count)
-    running_rewards += reward
-    if reward != 0:
-        print('Score (cumulative rewards): {} '.format(running_rewards))
-    return (reward, running_rewards)
+def total_actions(coords, A):
+    arr1 = [-1.0, 0.0, 1.0]
+    arr2 = [0.0, 1.0]
+    permutations = list(itertools.product(arr1, arr1, arr2, arr2, arr2))
+    a_list = []
+    for a in range(A):
+        coordinates = (coords[a][0], coords[a][1])
+        for perm in permutations:
+            a_list.append(np.array(coordinates + perm, dtype=np.intc))
+    return a_list
+
+
+def main():
+    n_epoch = 100
+    width = 8
+    height = 8
+    env = deepmind_lab.Lab(
+        "seekavoid_arena_01",
+        ["RGB_INTERLEAVED"],
+        config={"fps": "60", "width": str(width), "height": str(height)}
+    )
+    env.reset()
+    d_context = width * height * 3
+    action_space = total_actions(action_segments())
+    num_disc_steps = len(action_space)
+    val_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
+    targ_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
+    agent = Q_Learning(0.5, 0.99, val_model, targ_model, action_space, d_context, history_len=1)
+    train(n_epoch, env, agent)
+
+
+def train(n_epoch, env, agent):
+    frame_count = 0
+    running_rewards = []
+    for i in range(n_epoch):
+        start_time = time.process_time()
+        done = False
+        env.reset()
+        obs = env.observations()["RGB_INTERLEAVED"].flatten()
+        state = agent.init_state(torch.Tensor(obs))
+        episode_reward = 0
+        agent.epsilon *= 0.99
+        while not done:
+            values, action_ind = agent.get_action(state)
+            reward = env.step(agent.choose_action(action_ind),num_steps=4)
+            episode_reward += reward
+            done = not env.is_running()
+            if done:
+                agent.replay_buffer.add_sample(state, action_ind, reward, state, done)
+                agent.train_step(frame_count)
+                break
+            else:
+                obs = env.observations()["RGB_INTERLEAVED"].flatten()
+                next_state = agent.get_state(torch.Tensor(obs))
+                agent.replay_buffer.add_sample(state, action_ind, reward, next_state, done)
+                agent.train_step(frame_count)
+                state = next_state
+                frame_count += 1
+
+        running_rewards.append(episode_reward)
+        print(i, time.process_time() - start_time, episode_reward)
 
 class SAValueNN(nn.Module):
     def __init__(self, num_hidden, num_actions):
@@ -180,3 +229,7 @@ class Q_Learning:
         
         if frame_count % self.target_model_update_freq == 0:
             self.update_target_model()
+
+if __name__ == "__main__prior_sigma":
+    main()
+
