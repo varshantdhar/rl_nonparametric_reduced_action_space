@@ -233,7 +233,7 @@ class DRRN_Agent:
         arr2 = [0.0, 1.0]
         permutations = list(itertools.product(arr1, arr1, arr2, arr2, arr2))
         a_list = []
-        for a in A:
+        for a in range(A):
             coordinates = (coords[a][0], coords[a][1])
             for perm in permutations:
                 a_list.append(np.array(coordinates + perm, dtype=np.intc))
