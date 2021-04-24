@@ -211,7 +211,7 @@ class DRRN_Agent:
         actions = self.action_list(arm)
         action_val = self.act(state, actions)
         action = np.array(action_val, dtype=np.intc)
-        reward = env.step(action, num_steps=4)
+        reward = (env.step(action, num_steps=4) * 100) + 1
         return (reward, action)
 
     def train_network(self, state, action, reward, next_state, next_actions, done):
@@ -220,9 +220,9 @@ class DRRN_Agent:
         loss = self.update()
         if loss is not None:
             print('Loss: {}'.format(loss))
-            outfile = open('HLGM_DRRN_LOSS','ab+')
-            pickle.dump({'Loss': loss},outfile)
-            outfile.close()
+            #outfile = open('HLGM_DRRN_LOSS_CUMREWARDS','ab+')
+            #pickle.dump({'Loss': loss},outfile)
+            #outfile.close()
 
 
     def observe(self, state, act, rew, next_state, next_acts, done):

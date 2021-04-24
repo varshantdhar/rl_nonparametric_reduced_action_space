@@ -148,7 +148,8 @@ class BanditSampling(Bandit):
                 self.actions[action, t] = 0.0
             else:
                 # Update parameter posterior
-                episode_rewards += self.rewards[action, t]
+                episode_rewards += prev_reward
+                self.rewards[a, t] = episode_rewards
                 if self.rewards[action, t] != 0:
                     print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
@@ -163,10 +164,10 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         print("Cumulative Regrets for Episode: {}".format(self.cumregrets[-1]))
-        dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
-        outfile = open('HLGM_performance_coarse','ab+')
-        pickle.dump(dict_store,outfile)
-        outfile.close()
+        #dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time.time() - start_time}
+        #outfile = open('HLGM_performance_coarse_cumrewards','ab+')
+        #pickle.dump(dict_store,outfile)
+        #outfile.close()
         dqn_agent.q_learning_rewards = 0 # refresh episodic reward count
 
     @abc.abstractmethod
