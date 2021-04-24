@@ -254,7 +254,6 @@ class DRRN_Agent:
 
     def train_network(self, state, action, reward, next_state, next_actions, done):
         # actions = self.action_list(next_actions)
-        actions = arm
         self.observe(state, action, reward, next_state, actions, done)
         loss = self.update()
         if loss is not None:
