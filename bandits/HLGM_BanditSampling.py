@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     K = 5 # Number of mixtures per arm of the bandit
     prior_K = 5  # Assumed prior number of mixtures (per arm)
-    pi = np.random.rand(A, K)  
+    pi = np.random.rand(A, K)
     pi = pi / pi.sum(axis=1, keepdims=True) # Mixture proportions per arm
     theta = np.random.randn(A, K, d_context) # Thetas per arm and mixtures
     sigma=np.ones((A,K)) # Variances per arm and mixtures
