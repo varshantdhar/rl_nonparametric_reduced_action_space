@@ -211,7 +211,7 @@ class DRRN_Agent:
         actions = self.action_list(arm)
         action_val = self.act(state, actions)
         action = np.array(action_val, dtype=np.intc)
-        reward = (env.step(action, num_steps=4) * 100) + 1
+        reward = env.step(action, num_steps=4) * 100
         return (reward, action)
 
     def train_network(self, state, action, reward, next_state, next_actions, done):
