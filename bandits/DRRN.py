@@ -184,7 +184,7 @@ class DRRN(torch.nn.Module):
 class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
-        self.batch_size = 64
+        self.batch_size = 72
         self.action_dim = 1025
         self.obs_dim = 256
         self.network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
@@ -238,7 +238,7 @@ class DRRN_Agent:
     def update(self):
         if len(self.memory) < self.batch_size:
             return
-        print("")
+        print("Calculating Loss")
 
         transitions = self.memory.sample(self.batch_size)
         batch = Transition(*zip(*transitions))
