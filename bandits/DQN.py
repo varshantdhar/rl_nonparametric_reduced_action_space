@@ -86,7 +86,12 @@ def train(n_epoch, env, agent):
                 frame_count += 1
 
         running_rewards.append(episode_reward)
-        print(i, time.process_time() - start_time, episode_reward)
+        time = time.process_time() - start_time
+        print(i, time, episode_reward)
+        train_dict = {'iteration':i, 'time': time, 'reward': episode_reward}
+        outfile = open('dqn_performance','ab+')
+        pickle.dump(train_dict,outfile)
+        outfile.close()
 
 class SAValueNN(nn.Module):
     def __init__(self, num_hidden, num_actions):
