@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import random
 import itertools
 import pickle
+import deepmind_lab
 
 ######## Helper function ########
 def action_segments():
@@ -60,6 +61,25 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
         # post padding
         x[idx, :len(trunc)] = trunc
     return x
+
+def main():
+    agent = DRRN_Agent()
+    actions = agent.total_actions()
+    env = deepmind_lab.Lab(
+        "seekavoid_arena_01",
+        ["RGB_INTERLEAVED"],
+        config={"fps": "60", "width": '8', "height": '8'}
+    )
+    env.reset()
+    prev_reward = None
+    prev_action = None
+    prev_state = None
+    max_steps = 300 * 100
+    for _ in range(max_steps):
+        state = env.observations()["RGB_INTERLEAVED"].transpose(2,0,1).reshape(-1,8)
+        prev_reward, prev_action, prev_state = train(agent, state, env, actions, prev_reward, prev_action, prev_state)
+        if not env.is_running(): env.reset()
+
 
 def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
     if prev_state is None:
@@ -207,8 +227,21 @@ class DRRN_Agent:
             a_list.append(np.array(coordinates + perm, dtype=np.intc))
         return a_list
 
+    def total_actions(self):
+        coords, A = action_segments()
+        arr1 = [-1.0, 0.0, 1.0]
+        arr2 = [0.0, 1.0]
+        permutations = list(itertools.product(arr1, arr1, arr2, arr2, arr2))
+        a_list = []
+        for a in A:
+            coordinates = (coords[a][0], coords[a][1])
+            for perm in permutations:
+                a_list.append(np.array(coordinates + perm, dtype=np.intc))
+        print(len(a_list))
+        return a_list
+
     def execute_action(self, env, state, arm):
-        actions = self.action_list(arm)
+        # actions = self.action_list(arm)
         action_val = self.act(state, actions)
         action = np.array(action_val, dtype=np.intc)
         reward = env.step(action, num_steps=4)
@@ -222,7 +255,7 @@ class DRRN_Agent:
         loss = self.update()
         if loss is not None:
             print('Loss: {}'.format(loss))
-            outfile = open('HLGM_DRRN_LOSS_CUMREWARDS','ab+')
+            outfile = open('DRRN_LOSS','ab+')
             pickle.dump({'Loss': loss},outfile)
             outfile.close()
 
@@ -294,5 +327,9 @@ class DRRN_Agent:
         except Exception as e:
             print("Error saving model.")
             logging.error(traceback.format_exc())
+
+
+if __name__ == "__main__":
+    main()
 
 

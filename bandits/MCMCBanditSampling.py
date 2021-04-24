@@ -159,6 +159,6 @@ class MCMCBanditSampling(BanditSampling, MCMCPosterior):
         self.rewards_expected[:, t] = rewards_expected_samples.mean(axis=1)
 
 
-if __name__ == "__main__prior_sigma":
+if __name__ == "__main__":
     main()
 
