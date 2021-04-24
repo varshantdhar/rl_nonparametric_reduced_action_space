@@ -46,9 +46,10 @@ def main():
     d_context = width * height * 3
     coords, A = action_segments()
     action_space = torch.transpose(torch.Tensor(total_actions(coords, A)),0,1)
-    num_disc_steps = len(action_space)
-    val_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
-    targ_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
+    num_disc_steps = action_space.shape[0]
+    action_dim = action_space.shape[1]
+    val_model = Q_NN_multidim(d_context, action_dim, num_disc_steps, num_hidden=20)
+    targ_model = Q_NN_multidim(d_context, action_dim, num_disc_steps, num_hidden=20)
     agent = Q_Learning(0.5, 0.99, val_model, targ_model, action_space, d_context, history_len=1)
     train(n_epoch, env, agent)
 
