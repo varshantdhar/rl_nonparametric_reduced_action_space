@@ -45,7 +45,7 @@ def main():
     env.reset()
     d_context = width * height * 3
     coords, A = action_segments()
-    action_space = total_actions(coords, A)
+    action_space = torch.transpose(torch.Tensor(total_actions(coords, A)),0,1)
     num_disc_steps = len(action_space)
     val_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
     targ_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
