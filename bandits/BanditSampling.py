@@ -149,7 +149,7 @@ class BanditSampling(Bandit):
             else:
                 # Update parameter posterior
                 episode_rewards += prev_reward
-                self.rewards[a, t] = episode_rewards
+                self.rewards[action, t] = episode_rewards
                 if self.rewards[action, t] != 0:
                     print('Reward {} obtained at time step {}'.format(self.rewards[action, t], t))
                 self.update_reward_posterior(t)
