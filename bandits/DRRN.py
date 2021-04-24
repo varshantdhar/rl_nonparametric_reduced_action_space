@@ -244,7 +244,7 @@ class DRRN_Agent:
 
         # Compute Q(s', a') for all a'
         next_qvals = []
-        for next_state, next_act in zip(batch.next_state, batch.next_acts):
+        for next_state, next_acts in zip(batch.next_state, batch.next_acts):
             _, next_qval = self.target_network.act(next_state, next_acts)
             next_qvals.append(next_qval)
         # Take the max over next q-values
