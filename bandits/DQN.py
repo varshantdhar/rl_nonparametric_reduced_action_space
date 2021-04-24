@@ -230,6 +230,6 @@ class Q_Learning:
         if frame_count % self.target_model_update_freq == 0:
             self.update_target_model()
 
-if __name__ == "__main__prior_sigma":
+if __name__ == "__main__":
     main()
 
