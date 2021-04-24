@@ -164,7 +164,7 @@ class BanditSampling(Bandit):
         self.regrets = self.true_expected_rewards.max(axis=0) - self.rewards.sum(axis=0)
         self.cumregrets = self.regrets.cumsum()
         time_taken = time.time() - start_time
-        print("Cumulative Rewards for Episode: {} Time Taken: {}".format(self.cumregrets[-1], time_taken))
+        print("Cumulative Rewards for Episode: {} Time Taken: {}".format(episode_rewards, time_taken))
         dict_store = {'rewards': episode_rewards, 'regrets': self.cumregrets[-1], 'time': time_taken}
         outfile = open('DRRN_performance','ab+')
         pickle.dump(dict_store,outfile)
