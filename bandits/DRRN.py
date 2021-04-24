@@ -181,7 +181,8 @@ class DRRN(torch.nn.Module):
         # Encode the various aspects of the state
         state_out = self.packed_rnn(state, self.state_encoder, 'state')
         # Expand the state to match the batches of actions
-        state_out = state_out.repeat(1, 3).view(-1, 128)
+        # state_out = state_out.repeat(1, 3).view(-1, 128)
+        state_out = state_out.repeat(1, 219).view(-1, 128)
         z = torch.cat((state_out, act_out), dim=1) # Concat along hidden_dim
         z = F.relu(self.hidden(z))
         q_values = self.act_scorer(z).squeeze(-1)
@@ -205,7 +206,8 @@ class DRRN(torch.nn.Module):
 class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
-        self.batch_size = 72
+        # self.batch_size = 72
+        self.batch_size = 5256
         self.action_dim = 1025
         self.obs_dim = 256
         self.network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
