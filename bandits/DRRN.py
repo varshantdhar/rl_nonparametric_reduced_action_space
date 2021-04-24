@@ -271,7 +271,7 @@ class DRRN_Agent:
         loss = F.smooth_l1_loss(qvals, targets.detach())
         self.optimizer.zero_grad()
         loss.backward()
-        nn.utils.clip_grad_norm_(self.target_network.parameters(), self.clip)
+        nn.utils.clip_grad_norm_(self.network.parameters(), self.clip)
         self.optimizer.step()
         return loss.item()
 
