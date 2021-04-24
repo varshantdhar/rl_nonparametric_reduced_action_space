@@ -18,7 +18,7 @@ def action_segments():
         new_y = np.floor(x * np.sin(t) + y * np.cos(t))
         coords.append((new_x, new_y))
     A = len(coords)
-    return coords, A
+    return (coords, A)
 
 def total_actions(coords, A):
     arr1 = [-1.0, 0.0, 1.0]
@@ -43,7 +43,8 @@ def main():
     )
     env.reset()
     d_context = width * height * 3
-    action_space = total_actions(action_segments())
+    coords, A = action_segments()
+    action_space = total_actions(coords, A)
     num_disc_steps = len(action_space)
     val_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
     targ_model = Q_NN_multidim(d_context, 7, num_disc_steps, num_hidden=20)
