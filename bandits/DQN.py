@@ -66,7 +66,8 @@ def train(n_epoch, env, agent):
         agent.epsilon *= 0.99
         while not done:
             values, action_ind = agent.get_action(state)
-            reward = env.step(agent.choose_action(action_ind),num_steps=4)
+            action = np.array(agent.choose_action(action_ind).numpy(), dtype=np.intc)
+            reward = env.step(action,num_steps=4)
             episode_reward += reward
             done = not env.is_running()
             if done:
