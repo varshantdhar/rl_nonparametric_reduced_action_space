@@ -258,12 +258,17 @@ class DRRN_Agent:
         loss = self.update()
         if loss is not None:
 <<<<<<< HEAD
+<<<<<<< HEAD
             print('Loss: {}'.format(loss))
             outfile = open('DRRN_LOSS','ab+')
 =======
             outfile = open('HLGM_DRRN_LOSS_CUMREWARDS','ab+')
 >>>>>>> 0b09e352638d999ef5b1545bc37d1de7edf92e0a
             pickle.dump({'Loss': loss},outfile)
+=======
+            outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
+            pickle.dump({'Loss': loss}, outfile)
+>>>>>>> 5a54633e3b893dfb49c382026e55b11375d9e42f
             outfile.close()
 
 
