@@ -240,7 +240,6 @@ class DRRN_Agent:
             coordinates = (coords[a][0], coords[a][1])
             for perm in permutations:
                 a_list.append(np.array(coordinates + perm, dtype=np.intc))
-        print(len(a_list))
         return a_list
 
     def execute_action(self, env, state, arm):
@@ -277,6 +276,7 @@ class DRRN_Agent:
 
 
     def update(self):
+        print(len(self.memory))
         if len(self.memory) < self.batch_size:
             return
 
