@@ -125,19 +125,17 @@ class BanditSampling(Bandit):
             self.arm_N_samples[t] = self.arm_predictive_policy["arm_N_samples"]
 
             # Pick next action
-            '''
             self.actions[
                 np.random.multinomial(
                     1,
-                    self.arm_predictive_density["mean"][:, t],
+                    # self.arm_predictive_density["mean"][:, t],
+                    [1/(self.A)]*self.A,
                     size=int(self.arm_N_samples[t]),
                 )
                 .sum(axis=0)
                 .argmax(),
                 t,
             ] = 1
-            '''
-            self.actions[np.random.multinomial(1, [1/(self.A)]*self.A,size=int(self.arm_N_samples[t])).sum(axis=0).argmax(),t]=1
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
