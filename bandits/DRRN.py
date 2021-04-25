@@ -226,10 +226,10 @@ class DRRN_Agent:
         self.observe(state, action, reward, next_state, actions, done)
         loss = self.update()
         if loss is not None:
-            print('Loss: {}'.format(loss))
-            #outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
-            #pickle.dump({'Loss': loss}, outfile)
-            #outfile.close()
+            #print('Loss: {}'.format(loss))
+            outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
+            pickle.dump({'Loss': loss}, outfile)
+            outfile.close()
 
 
     def observe(self, state, act, rew, next_state, next_acts, done):
