@@ -276,7 +276,6 @@ class DRRN_Agent:
 
 
     def update(self):
-        print(len(self.memory))
         if len(self.memory) < self.batch_size:
             return
 
