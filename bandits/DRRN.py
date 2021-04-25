@@ -62,25 +62,6 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', value=0.):
         x[idx, :len(trunc)] = trunc
     return x
 
-def main():
-    agent = DRRN_Agent()
-    actions = agent.total_actions()
-    env = deepmind_lab.Lab(
-        "seekavoid_arena_01",
-        ["RGB_INTERLEAVED"],
-        config={"fps": "60", "width": '8', "height": '8'}
-    )
-    env.reset()
-    prev_reward = None
-    prev_action = None
-    prev_state = None
-    max_steps = 100
-    for _ in range(max_steps):
-        env.reset()
-        while env.is_running():
-            state = env.observations()["RGB_INTERLEAVED"].transpose(2,0,1).reshape(-1,8)
-            prev_reward, prev_action, prev_state = train(agent, state, env, actions, prev_reward, prev_action, prev_state)
-
 
 def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
     if prev_state is None:
@@ -207,8 +188,8 @@ class DRRN(torch.nn.Module):
 class DRRN_Agent:
     def __init__(self):
         self.gamma = 0.9
-        # self.batch_size = 72
-        self.batch_size = 5256
+        self.batch_size = 72
+        # self.batch_size = 5256
         self.action_dim = 1025
         self.obs_dim = 256
         self.network = DRRN(self.action_dim, self.obs_dim, embedding_dim=128, hidden_dim=128)
@@ -230,18 +211,6 @@ class DRRN_Agent:
             a_list.append(np.array(coordinates + perm, dtype=np.intc))
         return a_list
 
-    def total_actions(self):
-        coords, A = action_segments()
-        arr1 = [-1.0, 0.0, 1.0]
-        arr2 = [0.0, 1.0]
-        permutations = list(itertools.product(arr1, arr1, arr2, arr2, arr2))
-        a_list = []
-        for a in range(A):
-            coordinates = (coords[a][0], coords[a][1])
-            for perm in permutations:
-                a_list.append(np.array(coordinates + perm, dtype=np.intc))
-        return a_list
-
     def execute_action(self, env, state, arm):
         # actions = self.action_list(arm)
         actions = arm
@@ -253,15 +222,15 @@ class DRRN_Agent:
         return (reward, action)
 
     def train_network(self, state, action, reward, next_state, next_actions, done):
-        # actions = self.action_list(next_actions)
-        actions = next_actions
+        actions = self.action_list(next_actions)
+        # actions = next_actions
         self.observe(state, action, reward, next_state, actions, done)
         loss = self.update()
         if loss is not None:
             print('Loss: {}'.format(loss))
-            #outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
-            #pickle.dump({'Loss': loss}, outfile)
-            #outfile.close()
+            outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
+            pickle.dump({'Loss': loss}, outfile)
+            outfile.close()
 
 
     def observe(self, state, act, rew, next_state, next_acts, done):
@@ -332,8 +301,5 @@ class DRRN_Agent:
             print("Error saving model.")
             logging.error(traceback.format_exc())
 
-
-if __name__ == "__main__":
-    main()
 
 
