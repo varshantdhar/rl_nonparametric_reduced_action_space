@@ -74,11 +74,12 @@ def main():
     prev_reward = None
     prev_action = None
     prev_state = None
-    max_steps = 300 * 100
+    max_steps = 100
     for _ in range(max_steps):
-        state = env.observations()["RGB_INTERLEAVED"].transpose(2,0,1).reshape(-1,8)
-        prev_reward, prev_action, prev_state = train(agent, state, env, actions, prev_reward, prev_action, prev_state)
-        if not env.is_running(): env.reset()
+        env.reset()
+        while env.is_running():
+            state = env.observations()["RGB_INTERLEAVED"].transpose(2,0,1).reshape(-1,8)
+            prev_reward, prev_action, prev_state = train(agent, state, env, actions, prev_reward, prev_action, prev_state)
 
 
 def train(agent, state, env, arm, prev_reward=None, prev_action=None, prev_state=None):
@@ -258,9 +259,9 @@ class DRRN_Agent:
         loss = self.update()
         if loss is not None:
             print('Loss: {}'.format(loss))
-            outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
-            pickle.dump({'Loss': loss}, outfile)
-            outfile.close()
+            #outfile = open('HLGM_DRRN_LOSS_RANDOM','ab+')
+            #pickle.dump({'Loss': loss}, outfile)
+            #outfile.close()
 
 
     def observe(self, state, act, rew, next_state, next_acts, done):
