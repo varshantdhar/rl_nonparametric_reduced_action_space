@@ -139,7 +139,7 @@ class BanditSampling(Bandit):
                 .argmax(),
                 t,
             ] = 1
-            print(self.arm_predictive_density["mean"][:, t])
+            print(arm)
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
