@@ -120,7 +120,7 @@ class MCMCPosterior(object):
             n_iter=1
             (XcondZ_loglik[n_iter], Z_loglik[n_iter])=self.compute_loglikelihood(a, z_a, N_ak, x_a, y_a)
 
-            outfile = open('HLGM_loglik_coarse_cumrewards','ab+')
+            outfile = open('HLGM_loglik_random_cumrewards','ab+')
             loglike_store = {'t': t, 'n_iter': n_iter, 'no_observations': t_a.sum(), 'arm': a, 'loglikelihood': XcondZ_loglik[n_iter]+Z_loglik[n_iter]}
             pickle.dump(loglike_store,outfile)
             outfile.close()
