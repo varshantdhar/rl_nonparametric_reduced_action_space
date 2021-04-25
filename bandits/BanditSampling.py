@@ -128,14 +128,15 @@ class BanditSampling(Bandit):
             self.actions[
                 np.random.multinomial(
                     1,
-                    # self.arm_predictive_density["mean"][:, t],
-                    [1/(self.A)]*self.A,
+                    self.arm_predictive_density["mean"][:, t],
+                    # [1/(self.A)]*self.A,
                     size=int(self.arm_N_samples[t]),
                 )
                 .sum(axis=0)
                 .argmax(),
                 t,
             ] = 1
+            print(self.arm_predictive_density["mean"][:, t])
             action = np.where(self.actions[:, t] == 1)[0][0]
 
             # Play selected arm
